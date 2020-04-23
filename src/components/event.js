@@ -71,7 +71,7 @@ export const createEventsList = (events, eventsListElement) => {
   let dayNumber = 0;
   let lastDate = new Date(0);
   let container;
-  events.map((item, index) => {
+  events.forEach((item, index) => {
     const eventDate = new Date(item.dateStart);
     eventDate.setHours(0, 0, 0, 0); // время не участвует в сравнении дат
     if (eventDate.getTime() !== lastDate.getTime()) {
@@ -90,8 +90,5 @@ export const createEventsList = (events, eventsListElement) => {
     } else {
       render(container, createEventTemplate(item), `beforeEnd`);
     }
-
-    // index === 0 ? render(container, createEventEditTemplate(item), `beforeEnd`) : render(container, createEventTemplate(item), `beforeEnd`);
-    // изначально был такой вариант условия, но на него ругается линтер - говорит "Expected an assignment or function call and instead saw an expression no-unused-expressions"
   });
 };

@@ -3,7 +3,7 @@ export const createTripInfoCostTemplate = (data) => {
   data.forEach((item) => {
     total += item.price;
     if (item.type.offers) { // пока мы берем офферы из типов событий. как приедут настоящие данные перепишем эту часть (т.к. пока хз, как там все организовано, то почему бы пока не сделать так?)
-      item.type.offers.map((offer) => {
+      item.type.offers.forEach((offer) => {
         total += +offer.price;
       });
     }

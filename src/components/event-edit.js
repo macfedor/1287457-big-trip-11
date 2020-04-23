@@ -39,6 +39,14 @@ const generatePhoto = (photo) => {
   );
 };
 
+const generateCityOption = (city) => {
+  return (
+    `
+      <option value="${city}"></option>
+    `
+  );
+};
+
 export const createEventEditTemplate = (data) => {
   return (
     `
@@ -79,13 +87,7 @@ export const createEventEditTemplate = (data) => {
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${data.city}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${CITIES.map((city) => {
-      return (
-        `
-        <option value="${city}"></option>
-      `
-      );
-    })};
+              ${CITIES.map(generateCityOption).join(``)}
             </datalist>
           </div>
 

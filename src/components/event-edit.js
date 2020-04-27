@@ -47,7 +47,7 @@ const generateCityOption = (city) => {
   );
 };
 
-export const createEventEditTemplate = (data) => {
+export const createEventEditTemplate = (eventItem) => {
   return (
     `
       <form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -55,7 +55,7 @@ export const createEventEditTemplate = (data) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${data.type.icon}" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${eventItem.type.icon}" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -64,7 +64,7 @@ export const createEventEditTemplate = (data) => {
       `
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Transfer</legend>
-                    ${transfers.map((item) => generateEventType(item, data)).join(``)}
+                    ${transfers.map((item) => generateEventType(item, eventItem)).join(``)}
                   </fieldset>
                 `
       : ``}
@@ -74,7 +74,7 @@ export const createEventEditTemplate = (data) => {
       `
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Transfer</legend>
-                    ${activities.map((item) => generateEventType(item, data)).join(``)}
+                    ${activities.map((item) => generateEventType(item, eventItem)).join(``)}
                   </fieldset>
                 `
       : ``}
@@ -83,9 +83,9 @@ export const createEventEditTemplate = (data) => {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${data.type.name} ${data.type.action}
+              ${eventItem.type.name} ${eventItem.type.action}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${data.city}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${eventItem.city}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${CITIES.map(generateCityOption).join(``)}
             </datalist>
@@ -95,12 +95,12 @@ export const createEventEditTemplate = (data) => {
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${castFormat(data.dateStart.getDate())}/${castFormat(data.dateStart.getMonth())}/${data.dateStart.getFullYear().toString().substr(-2)} ${formatTime(data.dateStart)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${castFormat(eventItem.dateStart.getDate())}/${castFormat(eventItem.dateStart.getMonth())}/${eventItem.dateStart.getFullYear().toString().substr(-2)} ${formatTime(eventItem.dateStart)}">
             —
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${castFormat(data.dateEnd.getDate())}/${castFormat(data.dateEnd.getMonth())}/${data.dateEnd.getFullYear().toString().substr(-2)} ${formatTime(data.dateEnd)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${castFormat(eventItem.dateEnd.getDate())}/${castFormat(eventItem.dateEnd.getMonth())}/${eventItem.dateEnd.getFullYear().toString().substr(-2)} ${formatTime(eventItem.dateEnd)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -108,32 +108,32 @@ export const createEventEditTemplate = (data) => {
               <span class="visually-hidden">Price</span>
               €
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${data.price}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${eventItem.price}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
         </header>
         <section class="event__details">
-          ${data.type.offers ?
+          ${eventItem.type.offers ?
       `
             <section class="event__section  event__section--offers">
               <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
               <div class="event__available-offers">
-                ${data.type.offers.map(generateOffer).join(``)}
+                ${eventItem.type.offers.map(generateOffer).join(``)}
               </div>
             </section>
           ` : ``} 
           <section class="event__section  event__section--destination">
-            ${data.description ? `
+            ${eventItem.description ? `
               <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-              <p class="event__destination-description">${data.description}</p>
+              <p class="event__destination-description">${eventItem.description}</p>
             ` : ``}
-            ${data.photos ? `
+            ${eventItem.photos ? `
               <div class="event__photos-container">
                 <div class="event__photos-tape">
-                  ${data.photos.map(generatePhoto).join(`\n`)}
+                  ${eventItem.photos.map(generatePhoto).join(`\n`)}
                 </div>
               </div>
             ` : ``}

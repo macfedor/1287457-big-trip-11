@@ -12,14 +12,14 @@ export const createSortTemplate = (sorts) => {
   );
 };
 
-const createSortItem = (data) => {
-  const code = data.name.toLowerCase();
+const createSortItem = (sortItem) => {
+  const code = sortItem.name.toLowerCase();
   return (
     `
       <div class="trip-sort__item  trip-sort__item--${code}">
-        <input id="sort-${code}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${code}" ${data.isChecked ? `checked=""` : ``}>
-        <label class="trip-sort__btn  ${data.isChecked ? `trip-sort__btn--active` : ``} trip-sort__btn--by-increase" for="sort-${code}">
-          ${data.name}
+        <input id="sort-${code}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${code}" ${sortItem.isChecked ? `checked=""` : ``}>
+        <label class="trip-sort__btn  ${sortItem.isChecked ? `trip-sort__btn--active` : ``} trip-sort__btn--by-increase" for="sort-${code}">
+          ${sortItem.name}
         </label>
       </div>
     `

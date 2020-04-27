@@ -1,5 +1,4 @@
-import {createEventTemplate} from "./components/event.js";
-import {createEventEditTemplate} from "./components/event-edit.js";
+import {createEventsList} from "./components/event.js";
 import {createEventListTemplate} from "./components/event-list.js";
 import {createFilterTemplate} from "./components/filter.js";
 import {createMenuTemplate} from "./components/menu.js";
@@ -7,10 +6,16 @@ import {createSortTemplate} from "./components/sort.js";
 import {createTripInfoTemplate} from "./components/trip-info.js";
 import {createTripInfoCostTemplate} from "./components/trip-info-cost.js";
 import {createTripInfoMainTemplate} from "./components/trip-info-main.js";
+import {generateEvents} from "./mock/event.js";
+import {filters} from "./mock/filter.js";
+import {sorts} from "./mock/sort.js";
+import {compareDates} from "./utils.js";
 
-const EVENTS_COUNT = 3;
+const EVENTS_COUNT = 22;
+const events = generateEvents(EVENTS_COUNT);
+const sortedEvents = events.concat().sort(compareDates);
 
-const render = (container, template, place) => {
+export const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 
@@ -24,19 +29,20 @@ render(tripMainElement, createTripInfoTemplate(), `afterBegin`);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
-render(tripInfoElement, createTripInfoMainTemplate(), `beforeEnd`);
-render(tripInfoElement, createTripInfoCostTemplate(), `beforeEnd`);
-render(controlsElement, createFilterTemplate(), `beforeEnd`);
+render(tripInfoElement, createTripInfoMainTemplate(sortedEvents), `beforeEnd`);
+render(tripInfoElement, createTripInfoCostTemplate(sortedEvents), `beforeEnd`);
+
+
+render(controlsElement, createFilterTemplate(filters), `beforeEnd`);
 
 const cotrolsFirstTitle = controlsElement.querySelector(`h2`);
 render(cotrolsFirstTitle, createMenuTemplate(), `afterEnd`);
 
-render(eventsElement, createSortTemplate(), `beforeEnd`);
-render(eventsElement, createEventEditTemplate(), `beforeEnd`);
+render(eventsElement, createSortTemplate(sorts), `beforeEnd`);
 render(eventsElement, createEventListTemplate(), `beforeEnd`);
 
-const eventsListElement = eventsElement.querySelector(`.trip-events__list`);
+const eventsListElement = eventsElement.querySelector(`.trip-days`);
 
-for (let i = 0; i < EVENTS_COUNT; i++) {
-  render(eventsListElement, createEventTemplate(), `beforeEnd`);
-}
+createEventsList(sortedEvents, eventsListElement);
+
+

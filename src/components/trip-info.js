@@ -2,7 +2,9 @@ import {createElement} from "../utils.js";
 import {MONTH_SHORT_NAMES} from "../consts.js";
 
 const createTripInfoCost = (tripPoints) => {
+
   let total = 0;
+
   tripPoints.forEach((tripPoint) => {
     total += tripPoint.price;
     if (tripPoint.type.offers) { // пока мы берем офферы из типов событий. как приедут настоящие данные перепишем эту часть (т.к. пока хз, как там все организовано, то почему бы пока не сделать так?)
@@ -19,6 +21,7 @@ const createTripInfoCost = (tripPoints) => {
 };
 
 const createTripInfoMain = (tripPoints) => {
+
   const firstItem = tripPoints[0];
   const lastItem = tripPoints[tripPoints.length - 1];
 
@@ -31,6 +34,16 @@ const createTripInfoMain = (tripPoints) => {
 };
 
 const createTripInfoTemplate = (tripPoints) => {
+  if (!tripPoints.length) {
+    return (
+      `<section class="trip-main__trip-info trip-info">
+        <p class="trip-info__cost">
+          Total: €&nbsp;<span class="trip-info__cost-value">0</span>
+        </p>
+      </section>`
+    );
+  }
+
   return (
     `<section class="trip-main__trip-info trip-info">
       ${createTripInfoMain(tripPoints)}

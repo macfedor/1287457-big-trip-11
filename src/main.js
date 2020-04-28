@@ -3,6 +3,7 @@ import EventEditComponent from "./components/event-edit.js";
 import FilterComponent from "./components/filter.js";
 import MenuComponent from "./components/menu.js";
 import SortComponent from "./components/sort.js";
+import NoEventsComponent from "./components/no-events.js";
 import InfoBlockComponent from "./components/trip-info.js";
 import {generateEvents} from "./mock/event.js";
 import {filters} from "./mock/filter.js";
@@ -10,7 +11,7 @@ import {sorts} from "./mock/sort.js";
 import {compareDates, render, renderPosition, createElement, formatDate} from "./utils.js";
 import {MONTH_SHORT_NAMES} from "./consts.js";
 
-const EVENTS_COUNT = 22;
+const EVENTS_COUNT = 0;
 const events = generateEvents(EVENTS_COUNT);
 const sortedEvents = events.concat().sort(compareDates);
 
@@ -21,29 +22,49 @@ const controlsElement = headerElement.querySelector(`.trip-controls`);
 const eventsElement = mainElement.querySelector(`.trip-events`);
 
 const renderEvent = (container, currentEvent) => {
-
-  const onEditButtonClick = () => {
+  const openEventEdit = () => {
     container.replaceChild(eventEditElement.getElement(), eventElement.getElement());
   };
 
-  const onEditFormSubmit = (evt) => {
-    evt.preventDefault();
+  const closeEventEdit = () => {
     container.replaceChild(eventElement.getElement(), eventEditElement.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+    if (isEscKey) {
+      closeEventEdit();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
   };
 
   const eventElement = new EventComponent(currentEvent);
   const eventEditElement = new EventEditComponent(currentEvent);
 
   const editBtn = eventElement.getElement().querySelector(`.event__rollup-btn`);
-  editBtn.addEventListener(`click`, onEditButtonClick);
+  editBtn.addEventListener(`click`, () => {
+    openEventEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
 
   const editForm = eventEditElement.getElement().querySelector(`form`);
-  editForm.addEventListener(`submit`, onEditFormSubmit);
+  editForm.addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    closeEventEdit();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
   render(container, eventElement.getElement(), renderPosition.BEFOREEND);
 };
 
 const renderEventsList = () => {
+
+  if (!sortedEvents.length) {
+    render(eventsElement, new NoEventsComponent().getElement(), renderPosition.BEFOREEND);
+    return;
+  }
+
+  render(eventsElement, new SortComponent(sorts).getElement(), renderPosition.BEFOREEND);
 
   const createEventsListBlock = () => {
     return (
@@ -98,7 +119,4 @@ render(controlsElement, new FilterComponent(filters).getElement(), renderPositio
 const cotrolsFirstTitle = controlsElement.querySelector(`h2`);
 render(cotrolsFirstTitle, new MenuComponent().getElement(), renderPosition.AFTEREND);
 
-render(eventsElement, new SortComponent(sorts).getElement(), renderPosition.BEFOREEND);
-
 renderEventsList();
-

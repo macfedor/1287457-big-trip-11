@@ -1,5 +1,5 @@
 import {CITIES, EVENT_TYPES} from "../consts.js";
-import {castFormat, formatTime} from "../utils.js";
+import {castFormat, formatTime, createElement} from "../utils.js";
 const transfers = EVENT_TYPES.filter((item) => item.action === `to`);
 const activities = EVENT_TYPES.filter((item) => item.action === `in`);
 
@@ -47,10 +47,62 @@ const generateCityOption = (city) => {
   );
 };
 
-export const createEventEditTemplate = (eventItem) => {
+const createEventEditTemplate = (eventItem) => {
+
+  let transfersBlock = ``;
+  if (transfers.length > 0) {
+    transfersBlock = `
+      <fieldset class="event__type-group">
+        <legend class="visually-hidden">Transfer</legend>
+        ${transfers.map((item) => generateEventType(item, eventItem)).join(``)}
+      </fieldset>
+    `;
+  }
+
+  let activitiesBlock = ``;
+  if (activities.length > 0) {
+    activitiesBlock = `
+      <fieldset class="event__type-group">
+        <legend class="visually-hidden">Transfer</legend>
+        ${activities.map((item) => generateEventType(item, eventItem)).join(``)}
+      </fieldset>
+    `;
+  }
+
+  let offersBlock = ``;
+  if (eventItem.type.offers) {
+    offersBlock = `
+      <section class="event__section  event__section--offers">
+        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+        <div class="event__available-offers">
+          ${eventItem.type.offers.map(generateOffer).join(``)}
+        </div>
+      </section>
+    `;
+  }
+
+  let descriptionBlock = ``;
+  if (eventItem.description) {
+    descriptionBlock = `
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${eventItem.description}</p>
+    `;
+  }
+
+  let photosBlock = ``;
+  if (eventItem.photos) {
+    photosBlock = `
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${eventItem.photos.map(generatePhoto).join(`\n`)}
+        </div>
+      </div>
+    `;
+  }
+
   return (
-    `
-      <form class="trip-events__item  event  event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+      <form class="event  event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -60,24 +112,8 @@ export const createEventEditTemplate = (eventItem) => {
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
             <div class="event__type-list">
-              ${transfers.length > 0 ?
-      `
-                  <fieldset class="event__type-group">
-                    <legend class="visually-hidden">Transfer</legend>
-                    ${transfers.map((item) => generateEventType(item, eventItem)).join(``)}
-                  </fieldset>
-                `
-      : ``}
-              
-
-              ${activities.length > 0 ?
-      `
-                  <fieldset class="event__type-group">
-                    <legend class="visually-hidden">Transfer</legend>
-                    ${activities.map((item) => generateEventType(item, eventItem)).join(``)}
-                  </fieldset>
-                `
-      : ``}
+              ${transfersBlock}
+              ${activitiesBlock}
             </div>
           </div>
 
@@ -115,31 +151,36 @@ export const createEventEditTemplate = (eventItem) => {
           <button class="event__reset-btn" type="reset">Cancel</button>
         </header>
         <section class="event__details">
-          ${eventItem.type.offers ?
-      `
-            <section class="event__section  event__section--offers">
-              <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-              <div class="event__available-offers">
-                ${eventItem.type.offers.map(generateOffer).join(``)}
-              </div>
-            </section>
-          ` : ``} 
+          ${offersBlock} 
           <section class="event__section  event__section--destination">
-            ${eventItem.description ? `
-              <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-              <p class="event__destination-description">${eventItem.description}</p>
-            ` : ``}
-            ${eventItem.photos ? `
-              <div class="event__photos-container">
-                <div class="event__photos-tape">
-                  ${eventItem.photos.map(generatePhoto).join(`\n`)}
-                </div>
-              </div>
-            ` : ``}
+            ${descriptionBlock}
+            ${photosBlock}
           </section>    
         </section>
       </form>
-    `
+    </li>`
   );
 };
+
+export default class EventEdit {
+  constructor(eventItem) {
+    this._event = eventItem;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventEditTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

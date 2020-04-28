@@ -32,3 +32,33 @@ export const getRandomDate = (start, end) => {
 export const compareDates = (a, b) => {
   return a.dateStart.getTime() - b.dateStart.getTime();
 };
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};
+
+export const renderPosition = {
+  AFTERBEGIN: `afterBegin`,
+  BEFOREEND: `beforeEnd`,
+  AFTEREND: `afterEnd`
+};
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case renderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case renderPosition.BEFOREEND:
+      container.append(element);
+      break;
+    case renderPosition.AFTEREND:
+      if (container.nextSibling) {
+        container.parentNode.insertBefore(element, container.nextSibling);
+      } else {
+        container.parentNode.append(element);
+      }
+      break;
+  }
+};

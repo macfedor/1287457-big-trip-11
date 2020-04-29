@@ -1,5 +1,6 @@
+import AbstractComponent from "./abstract-component.js";
 import {CITIES, EVENT_TYPES} from "../consts.js";
-import {castFormat, formatTime, createElement} from "../utils.js";
+import {castFormat, formatTime} from "../utils/common.js";
 const transfers = EVENT_TYPES.filter((item) => item.action === `to`);
 const activities = EVENT_TYPES.filter((item) => item.action === `in`);
 
@@ -162,25 +163,17 @@ const createEventEditTemplate = (eventItem) => {
   );
 };
 
-export default class EventEdit {
+export default class EventEdit extends AbstractComponent {
   constructor(eventItem) {
+    super();
     this._event = eventItem;
-    this._element = null;
   }
 
   getTemplate() {
     return createEventEditTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEventEditSubmitHandler(handler) {
+    this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
   }
 }

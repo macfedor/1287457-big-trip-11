@@ -1,18 +1,18 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
 import {MONTH_SHORT_NAMES} from "../consts.js";
 
 const createTripInfoCost = (tripPoints) => {
-
   let total = 0;
-
-  tripPoints.forEach((tripPoint) => {
-    total += tripPoint.price;
-    if (tripPoint.type.offers) { // пока мы берем офферы из типов событий. как приедут настоящие данные перепишем эту часть (т.к. пока хз, как там все организовано, то почему бы пока не сделать так?)
-      tripPoint.type.offers.forEach((offer) => {
-        total += +offer.price;
-      });
-    }
-  });
+  if (tripPoints.length) {
+    tripPoints.forEach((tripPoint) => {
+      total += tripPoint.price;
+      if (tripPoint.type.offers) { // пока мы берем офферы из типов событий. как приедут настоящие данные перепишем эту часть (т.к. пока хз, как там все организовано, то почему бы пока не сделать так?)
+        tripPoint.type.offers.forEach((offer) => {
+          total += +offer.price;
+        });
+      }
+    });
+  }
   return (
     `<p class="trip-info__cost">
       Total: €&nbsp;<span class="trip-info__cost-value">${total}</span>
@@ -21,7 +21,9 @@ const createTripInfoCost = (tripPoints) => {
 };
 
 const createTripInfoMain = (tripPoints) => {
-
+  if (!tripPoints.length) {
+    return ``;
+  }
   const firstItem = tripPoints[0];
   const lastItem = tripPoints[tripPoints.length - 1];
 
@@ -34,16 +36,6 @@ const createTripInfoMain = (tripPoints) => {
 };
 
 const createTripInfoTemplate = (tripPoints) => {
-  if (!tripPoints.length) {
-    return (
-      `<section class="trip-main__trip-info trip-info">
-        <p class="trip-info__cost">
-          Total: €&nbsp;<span class="trip-info__cost-value">0</span>
-        </p>
-      </section>`
-    );
-  }
-
   return (
     `<section class="trip-main__trip-info trip-info">
       ${createTripInfoMain(tripPoints)}
@@ -52,25 +44,13 @@ const createTripInfoTemplate = (tripPoints) => {
   );
 };
 
-export default class TripInfo {
+export default class TripInfo extends AbstractComponent {
   constructor(tripPoints) {
+    super();
     this._points = tripPoints;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

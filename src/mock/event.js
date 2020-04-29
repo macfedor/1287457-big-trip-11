@@ -1,4 +1,4 @@
-import {castFormat, getRandomArrayItem, getRandomIntegerNumber, getRandomDate} from "../utils.js";
+import {castFormat, getRandomArrayItem, getRandomIntegerNumber, getRandomDate} from "../utils/common.js";
 import {MIN_PRICE, MAX_PRICE, MIN_SENTENCES, MAX_SENTENCES, MAX_DAYS_DIFF, MAX_EVENTS_DIFF, FIRST_DAY, DESCRIPTION_PARTS, CITIES, EVENT_TYPES, PHOTO_LINK, MAX_PHOTO_COUNT} from "../consts.js";
 
 const generateDescription = () => {

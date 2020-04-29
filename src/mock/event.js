@@ -16,7 +16,8 @@ const generateDates = () => {
 
   const dateEnd = getRandomDate(dateStart, maxDayEnd);
   if (dateEnd < dateStart) {
-    dateEnd.setHours(dateStart.getHours() + 1); // костыль для рандомных тестовых данных - время окончания не должно быть меньше времени начала
+    dateEnd.setDate(dateStart.getDate() + 1); // костыль для рандомных тестовых данных - время окончания не должно быть меньше времени начала
+    dateEnd.setMonth(dateStart.getMonth());
   }
 
   const getDuration = (start, end) => {

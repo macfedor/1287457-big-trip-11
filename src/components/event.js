@@ -1,7 +1,5 @@
-import {formatTime, formatDate} from "../utils.js";
-import {MAX_OFFERS_COUNT, MONTH_SHORT_NAMES} from "../consts.js";
-import {render} from "../main.js";
-import {createEventEditTemplate} from "./event-edit.js";
+import {formatTime, formatDate, createElement} from "../utils.js";
+import {MAX_OFFERS_COUNT} from "../consts.js";
 
 const createEventOffer = (offer) => {
   return (
@@ -15,10 +13,19 @@ const createEventOffer = (offer) => {
   );
 };
 
-export const createEventTemplate = (currentEvent) => {
+const createEventTemplate = (currentEvent) => {
+  let offersListTemplate = ``;
+  if (currentEvent.type.offers && currentEvent.type.offers.length > 0) { // кажется в таком виде это чисто визуально проще воспринимать, чем через тернанрый оператор
+    offersListTemplate = `
+      <h4 class="visually-hidden">Offers:</h4>
+      <ul class="event__selected-offers">
+        ${currentEvent.type.offers.slice(0, MAX_OFFERS_COUNT).map((item) => createEventOffer(item)).join(``)}
+      </ul>
+    `;
+  }
+
   return (
-    `
-      <li class="trip-events__item">
+    `<li class="trip-events__item">
         <div class="event">
           <div class="event__type">
             <img class="event__type-icon" width="42" height="42" src="img/icons/${currentEvent.type.icon}" alt="Event type icon">
@@ -37,58 +44,34 @@ export const createEventTemplate = (currentEvent) => {
           <p class="event__price">
             €&nbsp;<span class="event__price-value">${currentEvent.price}</span>
           </p>
-          ${currentEvent.type.offers && currentEvent.type.offers.length > 0 ?
-      `
-          <h4 class="visually-hidden">Offers:</h4>
-          <ul class="event__selected-offers">
-            ${currentEvent.type.offers.slice(0, MAX_OFFERS_COUNT).map((item) => createEventOffer(item)).join(``)}
-          </ul>
-          ` : ``}
+          ${offersListTemplate}
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
         </div>
-      </li>
-    `
+      </li>`
   );
 };
 
-const createEventsDay = (day) => {
-  return (
-    `
-      <li class="trip-days__item  day">
-        <div class="day__info">
-          <span class="day__counter">${day.dayNumber}</span>
-          <time class="day__date" datetime="${formatDate(day.date)}">${MONTH_SHORT_NAMES[day.date.getMonth()]} ${day.date.getDate()}</time>
-        </div>
-        <ul class="trip-events__list"></ul>
-      </li>
-    `
-  );
-};
+export default class Point {
+  constructor(currentEvent) {
+    this._event = currentEvent;
+    this._element = null;
+  }
 
-export const createEventsList = (events, eventsListElement) => {
-  let dayNumber = 0;
-  let lastDate = new Date(0);
-  let container;
-  events.forEach((item, index) => {
-    const eventDate = new Date(item.dateStart);
-    eventDate.setHours(0, 0, 0, 0); // время не участвует в сравнении дат
-    if (eventDate.getTime() !== lastDate.getTime()) {
-      dayNumber++;
-      lastDate = eventDate;
-      const dayData = {
-        dayNumber,
-        date: item.dateStart
-      };
-      render(eventsListElement, createEventsDay(dayData), `beforeEnd`);
-      const days = eventsListElement.querySelectorAll(`.trip-days__item.day`);
-      container = days[days.length - 1].querySelector(`.trip-events__list`);
+  getTemplate() {
+    return createEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
     }
-    if (index === 0) {
-      render(container, createEventEditTemplate(item), `beforeEnd`);
-    } else {
-      render(container, createEventTemplate(item), `beforeEnd`);
-    }
-  });
-};
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

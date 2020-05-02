@@ -3,9 +3,8 @@ import EventComponent from "../components/event.js";
 import EventEditComponent from "../components/event-edit.js";
 import EventsListComponent from "../components/events-list.js";
 import EventsDayComponent from "../components/events-day.js";
-import SortComponent from "../components/sort.js";
+import SortComponent, {sortType} from "../components/sort.js";
 import NoEventsComponent from "../components/no-events.js";
-import {sorts} from "../mock/sort.js";
 import {renderPosition, renderComponent, replace} from "../utils/render.js";
 
 const renderEvent = (container, currentEvent) => {
@@ -42,6 +41,22 @@ const renderEvent = (container, currentEvent) => {
   renderComponent(container, eventElement, renderPosition.BEFOREEND);
 };
 
+const getSortedEvents = (events, type) => {
+  let sortedEvents = [];
+  const preSortedEvents = events.slice();
+
+  switch (type) {
+    case sortType.TIME:
+      sortedEvents = preSortedEvents.sort((a, b) => (b.dateEnd.getTime() - b.dateStart.getTime()) - (a.dateEnd.getTime() - a.dateStart.getTime()));
+      break;
+    case sortType.PRICE:
+      sortedEvents = preSortedEvents.sort((a, b) => b.price - a.price);
+      break;
+  }
+
+  return sortedEvents;
+};
+
 
 export default class TripController extends AbstractComponent {
   constructor(container) {
@@ -58,7 +73,7 @@ export default class TripController extends AbstractComponent {
       return;
     }
 
-    renderComponent(this._container, new SortComponent(sorts), renderPosition.BEFOREEND);
+    renderComponent(this._container, this._sortComponent, renderPosition.BEFOREEND);
     renderComponent(this._container, this._eventsListComponent, renderPosition.BEFOREEND);
 
     const eventsListElement = this._container.querySelector(`.trip-days`);
@@ -86,5 +101,25 @@ export default class TripController extends AbstractComponent {
     };
 
     createEventsList(events, eventsListElement);
+
+    this._sortComponent.setChangeSortTypeHandler((currentSortType) => {
+      const daysTitleElement = this._container.querySelector(`.trip-sort__item--day`);
+
+      eventsListElement.innerHTML = ``;
+      daysTitleElement.innerHTML = ``;
+
+      if (currentSortType === sortType.EVENT) {
+        createEventsList(events, eventsListElement);
+      } else {
+        const sortedEvents = getSortedEvents(events, currentSortType);
+
+        renderComponent(eventsListElement, new EventsDayComponent(), renderPosition.BEFOREEND);
+        const sortedEventsListElement = eventsListElement.querySelector(`.trip-events__list`);
+
+        sortedEvents.forEach((currentEvent) => {
+          renderEvent(sortedEventsListElement, currentEvent);
+        });
+      }
+    });
   }
 }

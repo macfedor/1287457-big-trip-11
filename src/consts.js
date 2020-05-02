@@ -1,4 +1,4 @@
-import {getRandomIntegerNumber} from "./utils.js";
+import {getRandomIntegerNumber} from "./utils/common.js";
 
 export const MIN_PRICE = 10;
 

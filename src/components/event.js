@@ -1,4 +1,5 @@
-import {formatTime, formatDate, createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
+import {formatTime, formatDate} from "../utils/common.js";
 import {MAX_OFFERS_COUNT} from "../consts.js";
 
 const createEventOffer = (offer) => {
@@ -53,25 +54,17 @@ const createEventTemplate = (currentEvent) => {
   );
 };
 
-export default class Point {
+export default class Point extends AbstractComponent {
   constructor(currentEvent) {
+    super();
     this._event = currentEvent;
-    this._element = null;
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setOpenEventButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 }

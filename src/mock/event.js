@@ -1,9 +1,5 @@
 import {castFormat, getRandomArrayItem, getRandomIntegerNumber, getRandomDate} from "../utils/common.js";
-import {MIN_PRICE, MAX_PRICE, MIN_SENTENCES, MAX_SENTENCES, MAX_DAYS_DIFF, MAX_EVENTS_DIFF, FIRST_DAY, DESCRIPTION_PARTS, CITIES, EVENT_TYPES, PHOTO_LINK, MAX_PHOTO_COUNT} from "../consts.js";
-
-const generateDescription = () => {
-  return new Array(getRandomIntegerNumber(MIN_SENTENCES, MAX_SENTENCES)).fill(``).map(() => getRandomArrayItem(DESCRIPTION_PARTS)).join(`. `);
-};
+import {MIN_PRICE, MAX_PRICE, MAX_DAYS_DIFF, MAX_EVENTS_DIFF, FIRST_DAY, DESTINATIONS, EVENT_TYPES} from "../consts.js";
 
 const generateDates = () => {
   const lastDay = new Date();
@@ -40,26 +36,17 @@ const generateDates = () => {
   };
 };
 
-const generatePhoto = () => {
-  return PHOTO_LINK + Math.random();
-};
-
-const generatePhotos = (count) => {
-  return new Array(count).fill(``).map(generatePhoto);
-};
-
 const generateEvent = () => {
   const dates = generateDates();
 
   return {
-    description: generateDescription(),
     type: getRandomArrayItem(EVENT_TYPES),
-    city: getRandomArrayItem(CITIES),
+    destination: getRandomArrayItem(DESTINATIONS),
     dateStart: dates.dateStart,
     dateEnd: dates.dateEnd,
     duration: dates.duration,
     price: getRandomIntegerNumber(MIN_PRICE, MAX_PRICE),
-    photos: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+    isFavorite: getRandomIntegerNumber(0, 1)
   };
 };
 

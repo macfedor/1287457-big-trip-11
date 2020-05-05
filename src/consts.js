@@ -1,4 +1,4 @@
-import {getRandomIntegerNumber} from "./utils/common.js";
+import {getRandomIntegerNumber, getRandomArrayItem} from "./utils/common.js";
 
 export const MIN_PRICE = 10;
 
@@ -38,6 +38,7 @@ export const MONTH_SHORT_NAMES = [
 export const EVENT_TYPES = [
   {
     name: `Taxi`,
+    type: `taxi`,
     action: `to`,
     icon: `taxi.png`,
     offers: [
@@ -50,6 +51,7 @@ export const EVENT_TYPES = [
   },
   {
     name: `Bus`,
+    type: `bus`,
     action: `to`,
     icon: `bus.png`,
     offers: [
@@ -77,6 +79,7 @@ export const EVENT_TYPES = [
   },
   {
     name: `Train`,
+    type: `train`,
     action: `to`,
     icon: `train.png`,
     offers: [
@@ -94,6 +97,7 @@ export const EVENT_TYPES = [
   },
   {
     name: `Ship`,
+    type: `ship`,
     action: `to`,
     icon: `ship.png`,
     offers: [
@@ -126,6 +130,7 @@ export const EVENT_TYPES = [
   },
   {
     name: `Transport`,
+    type: `transport`,
     action: `to`,
     icon: `transport.png`,
     offers: [
@@ -153,11 +158,13 @@ export const EVENT_TYPES = [
   },
   {
     name: `Drive`,
+    type: `drive`,
     action: `to`,
     icon: `drive.png`,
   },
   {
     name: `Flight`,
+    type: `flight`,
     action: `to`,
     icon: `flight.png`,
     offers: [
@@ -190,6 +197,7 @@ export const EVENT_TYPES = [
   },
   {
     name: `Check-in`,
+    type: `check-in`,
     icon: `check-in.png`,
     action: `in`,
     offers: [
@@ -222,6 +230,7 @@ export const EVENT_TYPES = [
   },
   {
     name: `Sightseeing`,
+    type: `sightseeing`,
     icon: `sightseeing.png`,
     action: `in`,
     offers: [
@@ -254,6 +263,7 @@ export const EVENT_TYPES = [
   },
   {
     name: `Restaurant`,
+    type: `restaurant`,
     icon: `restaurant.png`,
     action: `in`,
     offers: [
@@ -286,15 +296,61 @@ export const EVENT_TYPES = [
   }
 ];
 
-export const CITIES = [
-  `Amsterdam`,
-  `Chamonix`,
-  `Geneva`,
-  `Moscow`,
-  `Omsk`,
-  `Stambul`
-];
-
 export const PHOTO_LINK = `http://picsum.photos/248/152?r=`;
 
 export const MAX_PHOTO_COUNT = 5;
+
+const generateDescription = () => {
+  return new Array(getRandomIntegerNumber(MIN_SENTENCES, MAX_SENTENCES)).fill(``).map(() => getRandomArrayItem(DESCRIPTION_PARTS)).join(`. `);
+};
+
+const generatePhoto = () => {
+  return {
+    src: PHOTO_LINK + Math.random(),
+    description: generateDescription()
+  };
+};
+
+const generatePhotos = (count) => {
+  return new Array(count).fill(``).map(generatePhoto);
+};
+
+export const DESTINATIONS = [
+  {
+    description: generateDescription(),
+    name: `Chamonix`,
+    pictures: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+  },
+  {
+    description: generateDescription(),
+    name: `Amsterdam`,
+    pictures: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+  },
+  {
+    description: generateDescription(),
+    name: `Geneva`,
+    pictures: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+  },
+  {
+    description: generateDescription(),
+    name: `Moscow`,
+    pictures: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+  },
+  {
+    description: generateDescription(),
+    name: `Stambul`,
+    pictures: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+  },
+  {
+    description: generateDescription(),
+    name: `Omsk`,
+    pictures: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+  },
+  {
+    description: generateDescription(),
+    name: `Tbilisi`,
+    pictures: generatePhotos(getRandomIntegerNumber(1, MAX_PHOTO_COUNT))
+  },
+];
+
+

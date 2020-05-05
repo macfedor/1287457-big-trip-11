@@ -1,19 +1,15 @@
+import moment from "moment";
+
 export const castFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
 export const formatTime = (date) => {
-  const hours = castFormat(date.getHours());
-  const minutes = castFormat(date.getMinutes());
-
-  return `${hours}:${minutes}`;
+  return moment(date).format(`HH:mm`);
 };
 
 export const formatDate = (date) => {
-  const year = date.getFullYear();
-  const month = castFormat(date.getMonth() + 1);
-  const day = castFormat(date.getDate());
-  return `${year}-${month}-${day}T${formatTime(date)}`;
+  return moment(date).format(`yyyy-MM-DDT${formatTime(date)}`);
 };
 
 export const getRandomArrayItem = (array) => {

@@ -1,5 +1,6 @@
+import moment from "moment";
 import AbstractComponent from "./abstract-component.js";
-import {formatTime, formatDate} from "../utils/common.js";
+import {formatTime, formatDate, castFormat} from "../utils/common.js";
 import {MAX_OFFERS_COUNT} from "../consts.js";
 
 const createEventOffer = (offer) => {
@@ -25,6 +26,12 @@ const createEventTemplate = (currentEvent) => {
     `;
   }
 
+  const duration = moment.duration(currentEvent.dateEnd.getTime() - currentEvent.dateStart.getTime());
+  let durationString = ``;
+  durationString += duration._data.days ? castFormat(duration._data.days) + `D ` : ``;
+  durationString += duration._data.hours ? castFormat(duration._data.hours) + `H ` : ``;
+  durationString += duration._data.minutes ? castFormat(duration._data.minutes) + `M` : ``;
+
   return (
     `<li class="trip-events__item">
         <div class="event">
@@ -39,7 +46,7 @@ const createEventTemplate = (currentEvent) => {
               —
               <time class="event__end-time" datetime="${formatDate(currentEvent.dateEnd)}">${formatTime(currentEvent.dateEnd)}</time>
             </p>
-            <p class="event__duration">${currentEvent.duration}</p>
+            <p class="event__duration">${durationString}</p>
           </div>
 
           <p class="event__price">

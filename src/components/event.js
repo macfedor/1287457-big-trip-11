@@ -31,7 +31,7 @@ const createEventTemplate = (currentEvent) => {
           <div class="event__type">
             <img class="event__type-icon" width="42" height="42" src="img/icons/${currentEvent.type.icon}" alt="Event type icon">
           </div>
-          <h3 class="event__title">${currentEvent.type.name} ${currentEvent.type.action} ${currentEvent.city}</h3>
+          <h3 class="event__title">${currentEvent.type.name} ${currentEvent.type.action} ${currentEvent.destination.name}</h3>
 
           <div class="event__schedule">
             <p class="event__time">
@@ -64,7 +64,7 @@ export default class Point extends AbstractComponent {
     return createEventTemplate(this._event);
   }
 
-  setOpenEventButtonClickHandler(handler) {
+  setOpenButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 }

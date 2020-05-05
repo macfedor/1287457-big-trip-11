@@ -1,5 +1,5 @@
-import AbstractComponent from "./abstract-component.js";
-import {CITIES, EVENT_TYPES} from "../consts.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
+import {DESTINATIONS, EVENT_TYPES} from "../consts.js";
 import {castFormat, formatTime} from "../utils/common.js";
 const transfers = EVENT_TYPES.filter((item) => item.action === `to`);
 const activities = EVENT_TYPES.filter((item) => item.action === `in`);
@@ -35,15 +35,15 @@ const generateOffer = (offer) => {
 const generatePhoto = (photo) => {
   return (
     `
-      <img class="event__photo" src="${photo}" alt="Event photo">
+      <img class="event__photo" src="${photo.src}" alt="${photo.description}">
     `
   );
 };
 
-const generateCityOption = (city) => {
+const generateCityOption = (destination) => {
   return (
     `
-      <option value="${city}"></option>
+      <option value="${destination.name}"></option>
     `
   );
 };
@@ -83,23 +83,25 @@ const createEventEditTemplate = (eventItem) => {
   }
 
   let descriptionBlock = ``;
-  if (eventItem.description) {
+  if (eventItem.destination.description) {
     descriptionBlock = `
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${eventItem.description}</p>
+      <p class="event__destination-description">${eventItem.destination.description}</p>
     `;
   }
 
   let photosBlock = ``;
-  if (eventItem.photos) {
+  if (eventItem.destination.pictures) {
     photosBlock = `
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${eventItem.photos.map(generatePhoto).join(`\n`)}
+          ${eventItem.destination.pictures.map(generatePhoto).join(`\n`)}
         </div>
       </div>
     `;
   }
+
+  const isFavorite = eventItem.isFavorite ? `checked` : ``;
 
   return (
     `<li class="trip-events__item">
@@ -122,9 +124,9 @@ const createEventEditTemplate = (eventItem) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${eventItem.type.name} ${eventItem.type.action}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${eventItem.city}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${eventItem.destination.name}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${CITIES.map(generateCityOption).join(``)}
+              ${DESTINATIONS.map(generateCityOption).join(``)}
             </datalist>
           </div>
 
@@ -150,6 +152,17 @@ const createEventEditTemplate = (eventItem) => {
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
+          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite}>
+          <label class="event__favorite-btn" for="event-favorite-1">
+            <span class="visually-hidden">Add to favorite</span>
+            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+            </svg>
+          </label>
+
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           ${offersBlock} 
@@ -163,17 +176,75 @@ const createEventEditTemplate = (eventItem) => {
   );
 };
 
-export default class EventEdit extends AbstractComponent {
+export default class EventEdit extends AbstractSmartComponent {
   constructor(eventItem) {
     super();
     this._event = eventItem;
+    this._subscribeOnEvents();
+    this._submitHandler = null;
+    this._favoriteBtnClickHandler = null;
+    this._closeHandler = null;
   }
 
   getTemplate() {
     return createEventEditTemplate(this._event);
   }
 
-  setEventEditSubmitHandler(handler) {
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setCloseButtonClickHandler(this._closeHandler);
+    this.setFavoriteButtonClickHandler(this._favoriteBtnClickHandler);
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  setSubmitHandler(handler) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, handler);
+    this._submitHandler = handler;
+  }
+
+  setCloseButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._closeHandler = handler;
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoriteBtnClickHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+    const currentType = element.querySelector(`[name="event-type"]:checked`).value;
+    const destinationElement = element.querySelector(`[name="event-destination"]`);
+
+    element.querySelectorAll(`[name="event-type"]`).forEach((it) => {
+      it.addEventListener(`click`, () => {
+        if (it.value !== currentType) {
+          this._event.type = EVENT_TYPES.find((type) => type.type === it.value);
+          this.rerender();
+        }
+      });
+    });
+
+    destinationElement.addEventListener(`change`, (evt) => {
+      const newValue = evt.target.value;
+      if (!newValue) {
+        evt.target.value = this._event.destination.name;
+        return;
+      }
+      this._event.destination = DESTINATIONS.find((it) => it.name === newValue);
+      this.rerender();
+    });
+
+    destinationElement.addEventListener(`keydown`, (evt) => {
+      if (evt.key !== `Backspace`) {
+        evt.preventDefault();
+      }
+    });
+
   }
 }

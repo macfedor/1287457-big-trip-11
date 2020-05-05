@@ -1,4 +1,4 @@
-import {castFormat, getRandomArrayItem, getRandomIntegerNumber, getRandomDate} from "../utils/common.js";
+import {getRandomArrayItem, getRandomIntegerNumber, getRandomDate} from "../utils/common.js";
 import {MIN_PRICE, MAX_PRICE, MAX_DAYS_DIFF, MAX_EVENTS_DIFF, FIRST_DAY, DESTINATIONS, EVENT_TYPES} from "../consts.js";
 
 const generateDates = () => {
@@ -16,23 +16,12 @@ const generateDates = () => {
     dateEnd.setMonth(dateStart.getMonth());
   }
 
-  const getDuration = (start, end) => {
-    let diff = Math.ceil((end.getTime() - start.getTime()) / 60000);
-    const days = Math.floor(diff / (60 * 24));
-    if (days > 0) {
-      diff -= days * 60 * 24;
-    }
-    const hours = Math.floor(diff / 60);
-    if (hours > 0) {
-      diff -= hours * 60;
-    }
-    return `${days ? `${castFormat(days)}D` : ``} ${hours ? `${castFormat(hours)}H` : ``} ${diff ? `${castFormat(diff)}M` : ``}`;
-  };
+  dateStart.setSeconds(0, 0); // еще немного костылей
+  dateEnd.setSeconds(0, 0);
 
   return {
     dateStart,
-    dateEnd,
-    duration: getDuration(dateStart, dateEnd)
+    dateEnd
   };
 };
 
@@ -44,7 +33,6 @@ const generateEvent = () => {
     destination: getRandomArrayItem(DESTINATIONS),
     dateStart: dates.dateStart,
     dateEnd: dates.dateEnd,
-    duration: dates.duration,
     price: getRandomIntegerNumber(MIN_PRICE, MAX_PRICE),
     isFavorite: getRandomIntegerNumber(0, 1)
   };

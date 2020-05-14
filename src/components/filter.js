@@ -1,5 +1,11 @@
 import AbstractComponent from "./abstract-component.js";
 
+export const FilterTypes = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`,
+};
+
 const createFilterTemplate = (filters) => {
   return (
     `<form class="trip-filters" action="#" method="get">
@@ -27,5 +33,12 @@ export default class Filter extends AbstractComponent {
 
   getTemplate() {
     return createFilterTemplate(this._filters);
+  }
+
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      const filterName = evt.target.value;
+      handler(filterName);
+    });
   }
 }

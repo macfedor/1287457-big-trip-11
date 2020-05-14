@@ -23,6 +23,7 @@
   "dependencies": {
     "css-loader": "^3.5.3",
     "flatpickr": "^4.6.3",
+    "he": "^1.2.0",
     "moment": "^2.25.3",
     "style-loader": "^1.2.1"
   }

@@ -10,6 +10,11 @@ export const renderPosition = {
   AFTEREND: `afterEnd`
 };
 
+export const remove = (component) => {
+  component.getElement().remove();
+  component.removeElement();
+};
+
 export const renderComponent = (container, component, place) => {
   switch (place) {
     case renderPosition.AFTERBEGIN:

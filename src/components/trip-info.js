@@ -5,7 +5,7 @@ const createTripInfoCost = (tripPoints) => {
   let total = 0;
 
   tripPoints.forEach((tripPoint) => {
-    total += tripPoint.price;
+    total += +tripPoint.price;
     if (tripPoint.type.offers) { // пока мы берем офферы из типов событий. как приедут настоящие данные перепишем эту часть (т.к. пока хз, как там все организовано, то почему бы пока не сделать так?)
       tripPoint.type.offers.forEach((offer) => {
         total += +offer.price;

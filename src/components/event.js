@@ -33,31 +33,29 @@ const createEventTemplate = (currentEvent) => {
   durationString += duration._data.minutes ? castFormat(duration._data.minutes) + `M` : ``;
 
   return (
-    `<li class="trip-events__item">
-        <div class="event">
-          <div class="event__type">
-            <img class="event__type-icon" width="42" height="42" src="img/icons/${currentEvent.type.icon}" alt="Event type icon">
-          </div>
-          <h3 class="event__title">${currentEvent.type.name} ${currentEvent.type.action} ${currentEvent.destination.name}</h3>
+    `<div class="event">
+      <div class="event__type">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${currentEvent.type.icon}" alt="Event type icon">
+      </div>
+      <h3 class="event__title">${currentEvent.type.name} ${currentEvent.type.action} ${currentEvent.destination.name}</h3>
 
-          <div class="event__schedule">
-            <p class="event__time">
-              <time class="event__start-time" datetime="${formatDate(currentEvent.dateStart)}">${formatTime(currentEvent.dateStart)}</time>
-              —
-              <time class="event__end-time" datetime="${formatDate(currentEvent.dateEnd)}">${formatTime(currentEvent.dateEnd)}</time>
-            </p>
-            <p class="event__duration">${durationString}</p>
-          </div>
+      <div class="event__schedule">
+        <p class="event__time">
+          <time class="event__start-time" datetime="${formatDate(currentEvent.dateStart)}">${formatTime(currentEvent.dateStart)}</time>
+          —
+          <time class="event__end-time" datetime="${formatDate(currentEvent.dateEnd)}">${formatTime(currentEvent.dateEnd)}</time>
+        </p>
+        <p class="event__duration">${durationString}</p>
+      </div>
 
-          <p class="event__price">
-            €&nbsp;<span class="event__price-value">${currentEvent.price}</span>
-          </p>
-          ${offersListTemplate}
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
-        </div>
-      </li>`
+      <p class="event__price">
+        €&nbsp;<span class="event__price-value">${currentEvent.price}</span>
+      </p>
+      ${offersListTemplate}
+      <button class="event__rollup-btn" type="button">
+        <span class="visually-hidden">Open event</span>
+      </button>
+    </div>`
   );
 };
 

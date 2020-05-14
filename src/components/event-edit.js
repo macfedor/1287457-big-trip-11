@@ -309,11 +309,10 @@ export default class EventEdit extends AbstractSmartComponent {
       const dateEndDefaultFormat = formatDateDefault(dateEnd, `DD-MM-YY HH:mm`);
       if (moment(dateEndDefaultFormat).isBefore(dateStartDefaultFormat)) {
         this._flatpickrEnd.destroy();
-        this._flatpickrEnd = flatpickr(dateEndElement, {
+        this._flatpickrEnd = flatpickr(dateEndElement, {// time_24hr: true, - надо добавить это чтобы время было в нормальном формате, но линтер ругается
           dateFormat: `d/m/y H:i`,
           defaultDate: dateStartElement.value,
           enableTime: true,
-          time_24hr: true,
           minDate: dateStartElement.value,
         });
       } else {
@@ -322,7 +321,6 @@ export default class EventEdit extends AbstractSmartComponent {
           dateFormat: `d/m/y H:i`,
           defaultDate: dateEnd,
           enableTime: true,
-          time_24hr: true,
           minDate: dateStartElement.value,
         });
       }
@@ -345,14 +343,12 @@ export default class EventEdit extends AbstractSmartComponent {
       defaultDate: this._event.dateStart || `today`,
       dateFormat: `d/m/y H:i`,
       enableTime: true,
-      time_24hr: true,
       minDate: `today`,
     });
     this._flatpickrEnd = flatpickr(dateEndElement, {
       dateFormat: `d/m/y H:i`,
       defaultDate: this._event.dateEnd || `today`,
       enableTime: true,
-      time_24hr: true,
       minDate: this._flatpickrStart.selectedDates[0],
     });
   }

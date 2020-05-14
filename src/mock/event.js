@@ -27,8 +27,8 @@ const generateDates = () => {
 
 const generateEvent = () => {
   const dates = generateDates();
-
   return {
+    id: String(new Date() + Math.random()),
     type: getRandomArrayItem(EVENT_TYPES),
     destination: getRandomArrayItem(DESTINATIONS),
     dateStart: dates.dateStart,

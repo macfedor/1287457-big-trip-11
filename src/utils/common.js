@@ -12,6 +12,10 @@ export const formatDate = (date) => {
   return moment(date).format(`yyyy-MM-DDT${formatTime(date)}`);
 };
 
+export const formatDateDefault = (date, formatString) => {
+  return moment(date, formatString).format();
+};
+
 export const getRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegerNumber(0, array.length - 1);
   return array[randomIndex];

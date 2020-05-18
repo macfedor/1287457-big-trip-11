@@ -32,3 +32,9 @@ export const getRandomDate = (start, end) => {
 export const compareDates = (a, b) => {
   return a.dateStart.getTime() - b.dateStart.getTime();
 };
+
+export const sortObjectByValues = (obj) => {
+  return Object.fromEntries(Object.entries(obj).sort(function (a, b) {
+    return b[1] - a[1];
+  }));
+};

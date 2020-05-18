@@ -1,4 +1,4 @@
-import AbstractComponent from "../components/abstract-component.js";
+import AbstractComponent, {HIDDEN_CLASS} from "../components/abstract-component.js";
 import EventsListComponent from "../components/events-list.js";
 import EventsDayComponent from "../components/events-day.js";
 import SortComponent, {sortType} from "../components/sort.js";
@@ -46,16 +46,25 @@ export default class TripController extends AbstractComponent {
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
     this.createNewEvent = this.createNewEvent.bind(this);
     this._resetFilter = this._resetFilter.bind(this);
+    this.sort = this.sort.bind(this);
     this._defaultSortType = sortType.EVENT;
     this._currentSortType = sortType.EVENT;
     this._creatingEvent = null;
+  }
+
+  show() {
+    this._container.classList.remove(HIDDEN_CLASS);
+  }
+
+  hide() {
+    this._container.classList.add(HIDDEN_CLASS);
   }
 
   _resetFilter() {
     this._filtersController.onFilterChange(FilterTypes.EVERYTHING);
   }
 
-  _sortTypeChangeHandler(currentSortType) {
+  sort(currentSortType) {
     const listElement = this._container.querySelector(`.trip-days`);
     const daysTitleElement = this._container.querySelector(`.trip-sort__item--day`);
     const points = this._pointsModel.getPoints();
@@ -78,6 +87,10 @@ export default class TripController extends AbstractComponent {
       });
     }
     this._currentSortType = currentSortType;
+  }
+
+  _sortTypeChangeHandler(currentSortType) {
+    this.sort(currentSortType);
   }
 
   _createEventsList(points, eventsContainer) {

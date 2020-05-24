@@ -35,266 +35,58 @@ export const MONTH_SHORT_NAMES = [
   `DEC`
 ];
 
-export const EVENT_TYPES = [
-  {
-    name: `Taxi`,
+export const TRIP_POINTS_TYPES = {
+  'taxi': {
     type: `taxi`,
-    action: `to`,
     icon: `taxi.png`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: `35`,
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
+    action: `to`,
   },
-  {
-    name: `Bus`,
+  'bus': {
     type: `bus`,
-    action: `to`,
     icon: `bus.png`,
-    offers: [
-      {
-        name: `Offer2`,
-        price: `35`,
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer3`,
-        price: `35`,
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer4`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer5`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
+    action: `to`,
   },
-  {
-    name: `Train`,
+  'train': {
     type: `train`,
-    action: `to`,
     icon: `train.png`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer2`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
+    action: `to`,
   },
-  {
-    name: `Ship`,
+  'ship': {
     type: `ship`,
-    action: `to`,
     icon: `ship.png`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer2`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer3`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer4`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer5`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
+    action: `to`,
   },
-  {
-    name: `Transport`,
+  'transport': {
     type: `transport`,
-    action: `to`,
     icon: `transport.png`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer2`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer3`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer4`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
+    action: `to`,
   },
-  {
-    name: `Drive`,
+  'drive': {
     type: `drive`,
-    action: `to`,
     icon: `drive.png`,
-  },
-  {
-    name: `Flight`,
-    type: `flight`,
     action: `to`,
-    icon: `flight.png`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer2`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer3`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer4`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer5`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
   },
-  {
-    name: `Check-in`,
+  'flight': {
+    type: `flight`,
+    icon: `flight.png`,
+    action: `to`,
+  },
+  'check-in': {
     type: `check-in`,
     icon: `check-in.png`,
     action: `in`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer2`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer3`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer4`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer5`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
   },
-  {
-    name: `Sightseeing`,
+  'sightseeing': {
     type: `sightseeing`,
     icon: `sightseeing.png`,
     action: `in`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer2`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer3`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer4`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer5`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
   },
-  {
-    name: `Restaurant`,
+  'restaurant': {
     type: `restaurant`,
     icon: `restaurant.png`,
     action: `in`,
-    offers: [
-      {
-        name: `Order Uber`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer2`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer3`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer4`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      },
-      {
-        name: `Offer5`,
-        price: Math.round(getRandomIntegerNumber(10, 100)),
-        isChecked: Math.round(getRandomIntegerNumber(0, 1))
-      }
-    ]
-  }
-];
+  },
+};
 
 export const PHOTO_LINK = `http://picsum.photos/248/152?r=`;
 

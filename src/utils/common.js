@@ -16,6 +16,12 @@ export const formatDateDefault = (date, formatString) => {
   return moment(date, formatString).format();
 };
 
+export const formatDateRAW = (date) => {
+  const [dateDate, dateTime] = date.split(` `);
+  const [dateDay, dateMonth, dateYearShort] = dateDate.split(`/`);
+  return `20${dateYearShort}-${dateMonth}-${dateDay}T${dateTime}`;
+};
+
 export const getRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegerNumber(0, array.length - 1);
   return array[randomIndex];
@@ -37,4 +43,8 @@ export const sortObjectByValues = (obj) => {
   return Object.fromEntries(Object.entries(obj).sort(function (a, b) {
     return b[1] - a[1];
   }));
+};
+
+export const ucFirst = (string) => {
+  return string[0].toUpperCase() + string.slice(1);
 };

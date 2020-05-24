@@ -71,3 +71,4 @@ export default class Points {
     return true;
   }
 }
+

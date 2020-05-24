@@ -48,3 +48,4 @@ export const sortObjectByValues = (obj) => {
 export const ucFirst = (string) => {
   return string[0].toUpperCase() + string.slice(1);
 };
+

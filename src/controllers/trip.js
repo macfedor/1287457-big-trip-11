@@ -122,26 +122,54 @@ export default class TripController extends AbstractComponent {
   }
 
   _onDataChange(pointController, oldData, newData) {
+    pointController.deleteErrorStyle();
     if (oldData === EmptyPoint) {
-      this._creatingEvent = null;
+      pointController.blockElement();
+      const addPointCallback = () => {
+        this._creatingEvent = null;
+        pointController.destroy();
+        const newEventButton = document.querySelector(`.trip-main__event-add-btn`);
+        newEventButton.disabled = false;
+        this._updatePoints();
+        this._updateTripInfo();
+      };
+
       if (newData !== null) {
-        this._pointsModel.addPoint(newData);
+        this._api.createPoint(newData)
+          .then((pointModel) => {
+            this._pointsModel.addPoint(pointModel);
+            pointController.unblockElement();
+            addPointCallback();
+          }).catch(() => {
+            pointController.shake();
+            pointController.setErrorStyle();
+            pointController.unblockElement();
+          });
+      } else {
+        addPointCallback();
       }
-      pointController.destroy();
-      const newEventButton = document.querySelector(`.trip-main__event-add-btn`);
-      newEventButton.disabled = false;
-      this._updatePoints();
-      this._updateTripInfo();
     } else if (newData === null) {
-      this._pointsModel.removePoint(oldData.id);
-      this._updatePoints();
-      this._updateTripInfo();
+      pointController.blockElement();
+      this._api.deletePoint(oldData.id)
+        .then(() => {
+          this._pointsModel.removePoint(oldData.id);
+          this._updatePoints();
+          this._updateTripInfo();
+          pointController.unblockElement();
+        }).catch(() => {
+          pointController.shake();
+          pointController.setErrorStyle();
+          pointController.unblockElement();
+        });
     } else {
       this._api.updatePoint(oldData.id, newData)
         .then((pointModel) => {
           this._pointsModel.updatePoint(oldData.id, pointModel);
           this._updatePoints();
           this._updateTripInfo();
+        }).catch(() => {
+          pointController.shake();
+          pointController.setErrorStyle();
         });
     }
   }
@@ -188,7 +216,8 @@ export default class TripController extends AbstractComponent {
     const pointController = new PointController(container, this._onDataChange, this._onViewChange);
     this._creatingEvent = pointController;
     newEventButton.disabled = true;
-    this._creatingEvent.render(EmptyPoint, Mode.ADDING);
+    EmptyPoint.id = document.querySelectorAll(`.trip-events__item`).length + 1;
+    this._creatingEvent.render(EmptyPoint, Mode.ADDING, this._destinationsData, this._offersData);
   }
 
   render(destinations, offers) {

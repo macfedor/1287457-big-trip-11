@@ -2,6 +2,7 @@ import AbstractComponent from "./abstract-component.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {sortObjectByValues} from "../utils/common.js";
+import {TRIP_POINTS_TYPES} from "../consts.js";
 
 const BAR_HEIGHT = 55;
 
@@ -68,7 +69,7 @@ const chartOptions = (title, format, isPrefix) => {
 const getData = (points, dataType) => {
   let data = {};
   points.forEach((point) => {
-    const name = point.type.name;
+    const name = point.type;
     let term = 1;
     if (dataType === DataTypes.TIME) {
       term = point.dateEnd.getTime() - point.dateStart.getTime();
@@ -195,7 +196,7 @@ export default class Statistics extends AbstractComponent {
   }
 
   renderCharts(points) {
-    const actionPoints = points.filter((item) => item.type.action === `to`);
+    const actionPoints = points.filter((item) => TRIP_POINTS_TYPES[item.type].action === `to`);
     this._resetCharts();
     this._moneyChart = renderMoneyChart(points);
     this._timeChart = renderTimeChart(points);

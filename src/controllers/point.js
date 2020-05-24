@@ -12,9 +12,10 @@ export const Mode = {
   ADDING: `adding`
 };
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 const generateEmptyPoint = () => {
   return {
-    id: String(new Date() + Math.random()),
     type: `taxi`,
     destination: {
       description: ``,
@@ -41,7 +42,7 @@ export default class PointController extends AbstractComponent {
     this._eventComponent = null;
     this._eventEditComponent = null;
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
-    this._destination = null;
+    this._destinationsList = null;
     this._offersList = null;
   }
 
@@ -91,6 +92,20 @@ export default class PointController extends AbstractComponent {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
+  blockElement() {
+    const formElements = this._eventEditComponent.getElement().querySelectorAll(`input, button, textarea, fieldset`);
+    formElements.forEach((item) => {
+      item.disabled = true;
+    });
+  }
+
+  unblockElement() {
+    const formElements = this._eventEditComponent.getElement().querySelectorAll(`input, button, textarea, fieldset`);
+    formElements.forEach((item) => {
+      item.disabled = false;
+    });
+  }
+
   parseFormData(formData) {
     const type = formData.get(`event-type`);
     const dataDateStart = formatDateRAW(formData.get(`event-start-time`));
@@ -106,30 +121,54 @@ export default class PointController extends AbstractComponent {
       }
     }
 
+    const currentDestination = this._destinationsList.find((destination) => destination.name === formData.get(`event-destination`));
+
     return new PointModel({
       "type": type,
       "date_from": dataDateStart,
       "date_to": dataDateEnd,
       "base_price": formData.get(`event-price`),
       "destination": {
-        name: this._destination.name,
-        description: this._destination.description,
-        pictures: this._destination.pictures,
+        name: currentDestination.name,
+        description: currentDestination.description,
+        pictures: currentDestination.pictures,
       },
       "is_favorite": formData.get(`event-favorite`),
       "offers": offers,
     });
   }
 
-  render(point, mode, destinations, offers) {
+  shake() {
+    this._eventEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._eventComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
 
+    setTimeout(() => {
+      this._eventEditComponent.getElement().style.animation = ``;
+      this._eventComponent.getElement().style.animation = ``;
+
+      this._eventEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  setErrorStyle() {
+    this._eventEditComponent.getElement().style.border = `1px solid #ff0000`;
+  }
+
+  deleteErrorStyle() {
+    this._eventEditComponent.getElement().style.border = ``;
+  }
+
+  render(point, mode, destinations, offers) {
     const oldEventComponent = this._eventComponent;
     const oldEventEditComponent = this._eventEditComponent;
 
     this._eventComponent = new EventComponent(point);
     this._eventEditComponent = new EventEditComponent(point, destinations, offers);
 
-    this._destination = point.destination;
+    this._destinationsList = destinations;
     this._offersList = offers;
 
     this._eventComponent.setOpenButtonClickHandler(() => {
@@ -144,10 +183,12 @@ export default class PointController extends AbstractComponent {
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
+      this._eventEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
       const formData = this._eventEditComponent.getData();
       const data = this.parseFormData(formData);
       this._onDataChange(this, point, data);
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
       this.resetEmptyPoint();
     });
 
@@ -159,8 +200,15 @@ export default class PointController extends AbstractComponent {
 
     this._eventEditComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();
+      if (this.mode === Mode.ADDING) {
+        this.destroyNewEvent();
+        this.resetEmptyPoint();
+        return;
+      }
+      this._eventEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
       this._onDataChange(this, point, null);
-      this._closeEventEdit();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 

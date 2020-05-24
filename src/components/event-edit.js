@@ -9,6 +9,11 @@ import moment from "moment";
 const transfers = Object.values(TRIP_POINTS_TYPES).filter((item) => item.action === `to`);
 const activities = Object.values(TRIP_POINTS_TYPES).filter((item) => item.action === `in`);
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
+
 const generateEventType = (item, currentItem) => {
   return (
     `
@@ -96,7 +101,10 @@ const createPhotosBlock = (pictures) => {
   return ``;
 };
 
-const createEventEditTemplate = (eventItem, destinationsData, offersData) => {
+const createEventEditTemplate = (eventItem, destinationsData, offersData, externalData) => {
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   let transfersBlock = ``;
   if (transfers.length > 0) {
@@ -126,7 +134,7 @@ const createEventEditTemplate = (eventItem, destinationsData, offersData) => {
 
   if (eventItem !== EmptyPoint) {
     additionalClass = ``;
-    resetBtnText = `Delete`;
+    resetBtnText = `${deleteButtonText}`;
   }
 
   return (
@@ -175,7 +183,7 @@ const createEventEditTemplate = (eventItem, destinationsData, offersData) => {
             <input class="event__input  event__input--price" required id="event-price-${eventItem.id}" type="number" name="event-price" value="${eventItem.price}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
           <button class="event__reset-btn" type="reset">${resetBtnText}</button>
           <input id="event-favorite-${eventItem.id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite}>
           <label class="event__favorite-btn" for="event-favorite-${eventItem.id}">
@@ -206,6 +214,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this._event = eventItem;
     this._destinationsData = destinationsData || [];
     this._offersData = offersData || [];
+    this._externalData = DefaultData;
     this._subscribeOnEvents();
     this._submitHandler = null;
     this._favoriteBtnClickHandler = null;
@@ -217,7 +226,7 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createEventEditTemplate(this._event, this._destinationsData, this._offersData);
+    return createEventEditTemplate(this._event, this._destinationsData, this._offersData, this._externalData);
   }
 
   recoveryListeners() {
@@ -254,6 +263,13 @@ export default class EventEdit extends AbstractSmartComponent {
     if (destination.pictures) {
       renderElement(container, createPhotosBlock(destination.pictures), renderPosition.BEFOREEND);
     }
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.getElement().querySelector(`.event__save-btn`).textContent = this._externalData.saveButtonText;
+    const deleteButton = this.getElement().querySelector(`.event__reset-btn`);
+    deleteButton.textContent = deleteButton.textContent === `Close` ? `Close` : this._externalData.deleteButtonText;
   }
 
   setSubmitHandler(handler) {

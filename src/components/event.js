@@ -1,13 +1,13 @@
 import moment from "moment";
 import AbstractComponent from "./abstract-component.js";
-import {formatTime, formatDate, castFormat} from "../utils/common.js";
-import {MAX_OFFERS_COUNT} from "../consts.js";
+import {formatTime, formatDate, castFormat, ucFirst} from "../utils/common.js";
+import {MAX_OFFERS_COUNT, TRIP_POINTS_TYPES} from "../consts.js";
 
 const createEventOffer = (offer) => {
   return (
     `
       <li class="event__offer">
-        <span class="event__offer-title">${offer.name}</span>
+        <span class="event__offer-title">${offer.title}</span>
         +
         €&nbsp;<span class="event__offer-price">${offer.price}</span>
       </li>
@@ -17,11 +17,11 @@ const createEventOffer = (offer) => {
 
 const createEventTemplate = (currentEvent) => {
   let offersListTemplate = ``;
-  if (currentEvent.type.offers && currentEvent.type.offers.length > 0) { // кажется в таком виде это чисто визуально проще воспринимать, чем через тернанрый оператор
+  if (currentEvent.offers && currentEvent.offers.length > 0) {
     offersListTemplate = `
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${currentEvent.type.offers.slice(0, MAX_OFFERS_COUNT).map((item) => createEventOffer(item)).join(``)}
+        ${currentEvent.offers.slice(0, MAX_OFFERS_COUNT).map((item) => createEventOffer(item)).join(``)}
       </ul>
     `;
   }
@@ -35,9 +35,9 @@ const createEventTemplate = (currentEvent) => {
   return (
     `<div class="event">
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${currentEvent.type.icon}" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${TRIP_POINTS_TYPES[currentEvent.type].icon}" alt="Event type icon">
       </div>
-      <h3 class="event__title">${currentEvent.type.name} ${currentEvent.type.action} ${currentEvent.destination.name}</h3>
+      <h3 class="event__title">${ucFirst(currentEvent.type)} ${TRIP_POINTS_TYPES[currentEvent.type].action} ${currentEvent.destination.name}</h3>
 
       <div class="event__schedule">
         <p class="event__time">

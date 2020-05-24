@@ -33,6 +33,10 @@ export const renderComponent = (container, component, place) => {
   }
 };
 
+export const renderElement = (container, elem, place) => {
+  container.insertAdjacentHTML(place, elem);
+};
+
 export const replace = (newComponent, oldComponent) => {
   const oldElement = oldComponent.getElement();
   const newElement = newComponent.getElement();

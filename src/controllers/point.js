@@ -2,7 +2,9 @@ import AbstractComponent from "../components/abstract-component.js";
 import EventComponent from "../components/event.js";
 import EventEditComponent from "../components/event-edit.js";
 import EventsListItemComponent from "../components/events-list-item.js";
+import PointModel from "../models/point.js";
 import {renderPosition, renderComponent, replace, remove} from "../utils/render.js";
+import {formatDateRAW, ucFirst} from "../utils/common.js";
 
 export const Mode = {
   DEFAULT: `default`,
@@ -10,23 +12,24 @@ export const Mode = {
   ADDING: `adding`
 };
 
-export let EmptyPoint = {
-  id: String(new Date() + Math.random()),
-  type: {// переделать когда появятся реальные данные, оставить только название типа
-    name: `Taxi`,
+const generateEmptyPoint = () => {
+  return {
+    id: String(new Date() + Math.random()),
     type: `taxi`,
-    action: `to`,
-    icon: `taxi.png`
-  },
-  destination: {
-    description: ``,
-    name: ``,
-  },
-  dateStart: new Date(),
-  dateEnd: new Date(),
-  price: ``,
-  isFavorite: false
+    destination: {
+      description: ``,
+      name: ``,
+      pictures: [],
+    },
+    dateStart: new Date(),
+    dateEnd: new Date(),
+    price: ``,
+    isFavorite: false,
+    offers: []
+  };
 };
+
+export let EmptyPoint = generateEmptyPoint();
 
 export default class PointController extends AbstractComponent {
   constructor(container, onDataChange, onViewChange) {
@@ -38,6 +41,8 @@ export default class PointController extends AbstractComponent {
     this._eventComponent = null;
     this._eventEditComponent = null;
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._destination = null;
+    this._offersList = null;
   }
 
   destroyNewEvent() {
@@ -47,23 +52,7 @@ export default class PointController extends AbstractComponent {
   }
 
   resetEmptyPoint() {
-    EmptyPoint = {
-      id: String(new Date() + Math.random()),
-      type: {// переделать когда появятся реальные данные, оставить только название типа
-        name: `Taxi`,
-        type: `taxi`,
-        action: `to`,
-        icon: `taxi.png`
-      },
-      destination: {
-        description: ``,
-        name: ``,
-      },
-      dateStart: new Date(),
-      dateEnd: new Date(),
-      price: ``,
-      isFavorite: false
-    };
+    EmptyPoint = generateEmptyPoint();
   }
 
   _openEventEdit() {
@@ -102,12 +91,46 @@ export default class PointController extends AbstractComponent {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  render(point, mode) {
+  parseFormData(formData) {
+    const type = formData.get(`event-type`);
+    const dataDateStart = formatDateRAW(formData.get(`event-start-time`));
+    const dataDateEnd = formatDateRAW(formData.get(`event-end-time`));
+    const offers = [];
+    const typicalOffers = this._offersList.find((offer) => offer.type === type).offers;
+
+    for (let key of formData.keys()) {
+      if (key.indexOf(`event-offer-`) !== -1) {
+        const offerName = ucFirst(key.split(`event-offer-`)[1].split(`_`).join(` `));
+        const offerPrice = typicalOffers.find((offer) => offer.title.toLowerCase() === offerName.toLowerCase()).price;
+        offers.push({title: offerName, price: offerPrice});
+      }
+    }
+
+    return new PointModel({
+      "type": type,
+      "date_from": dataDateStart,
+      "date_to": dataDateEnd,
+      "base_price": formData.get(`event-price`),
+      "destination": {
+        name: this._destination.name,
+        description: this._destination.description,
+        pictures: this._destination.pictures,
+      },
+      "is_favorite": formData.get(`event-favorite`),
+      "offers": offers,
+    });
+  }
+
+  render(point, mode, destinations, offers) {
+
     const oldEventComponent = this._eventComponent;
     const oldEventEditComponent = this._eventEditComponent;
 
     this._eventComponent = new EventComponent(point);
-    this._eventEditComponent = new EventEditComponent(point);
+    this._eventEditComponent = new EventEditComponent(point, destinations, offers);
+
+    this._destination = point.destination;
+    this._offersList = offers;
 
     this._eventComponent.setOpenButtonClickHandler(() => {
       this._openEventEdit();
@@ -121,17 +144,17 @@ export default class PointController extends AbstractComponent {
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._eventEditComponent.getData();
-      const modifiedPoint = Object.assign({}, point, data);
-      this._onDataChange(this, point, modifiedPoint); // тут перетираются значения в destination и offer. надо посмотреть, в каком виде данные будут поступать от сервера и тогда разобраться с этой частью
+      const formData = this._eventEditComponent.getData();
+      const data = this.parseFormData(formData);
+      this._onDataChange(this, point, data);
       document.removeEventListener(`keydown`, this._onEscKeyDown);
       this.resetEmptyPoint();
     });
 
     this._eventEditComponent.setFavoriteButtonClickHandler(() => {
-      this._onDataChange(this, point, Object.assign({}, point, {
-        isFavorite: !point.isFavorite,
-      }));
+      const newPoint = PointModel.clone(point);
+      newPoint.isFavorite = !newPoint.isFavorite;
+      this._onDataChange(this, point, newPoint);
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler((evt) => {
@@ -158,5 +181,6 @@ export default class PointController extends AbstractComponent {
         this.mode = Mode.ADDING;
         break;
     }
+
   }
 }

@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {TRIP_POINTS_TYPES} from "../consts.js";
-import {castFormat, formatTime, formatDateDefault, ucFirst} from "../utils/common.js";
+import {castFormat, formatTime, formatDateDefault, uppercaseFirstLetter} from "../utils/common.js";
 import {renderPosition, renderElement} from "../utils/render.js";
 import {EmptyPoint} from "../controllers/point.js";
 import flatpickr from "flatpickr";
@@ -19,7 +19,7 @@ const generateEventType = (item, currentItem) => {
     `
       <div class="event__type-item">
         <input id="event-type-${item.type}-${item.id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item.type}" ${item.type === currentItem.type ? `checked=""` : ``}>
-        <label class="event__type-label  event__type-label--${item.type}" for="event-type-${item.type}-${item.id}">${ucFirst(item.type)}</label>
+        <label class="event__type-label  event__type-label--${item.type}" for="event-type-${item.type}-${item.id}">${uppercaseFirstLetter(item.type)}</label>
       </div>
     `
   );
@@ -87,7 +87,7 @@ const createDescriptionBlock = (description) => {
 };
 
 const createPhotosBlock = (pictures) => {
-  if (pictures) {
+  if (pictures.length) {
     return (
       `
         <div class="event__photos-container">
@@ -155,7 +155,7 @@ const createEventEditTemplate = (eventItem, destinationsData, offersData, extern
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-${eventItem.id}">
-              ${ucFirst(eventItem.type)} ${TRIP_POINTS_TYPES[eventItem.type].action}
+              ${uppercaseFirstLetter(eventItem.type)} ${TRIP_POINTS_TYPES[eventItem.type].action}
             </label>
             <input class="event__input  event__input--destination" required id="event-destination-${eventItem.id}" type="text" name="event-destination" value="${eventItem.destination.name}" list="destination-list-${eventItem.id}">
             <datalist id="destination-list-${eventItem.id}">
@@ -180,7 +180,7 @@ const createEventEditTemplate = (eventItem, destinationsData, offersData, extern
               <span class="visually-hidden">Price</span>
               €
             </label>
-            <input class="event__input  event__input--price" required id="event-price-${eventItem.id}" type="number" name="event-price" value="${eventItem.price}">
+            <input class="event__input  event__input--price" required id="event-price-${eventItem.id}" type="number" name="event-price" min="0" value="${eventItem.price}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
@@ -215,9 +215,10 @@ export default class EventEdit extends AbstractSmartComponent {
     this._destinationsData = destinationsData || [];
     this._offersData = offersData || [];
     this._externalData = DefaultData;
+    this._offersBackup = null;
+    this._innerBackup = null;
     this._subscribeOnEvents();
     this._submitHandler = null;
-    this._favoriteBtnClickHandler = null;
     this._deleteBtnClickHandler = null;
     this._closeHandler = null;
     this._flatpickrStart = null;
@@ -229,10 +230,21 @@ export default class EventEdit extends AbstractSmartComponent {
     return createEventEditTemplate(this._event, this._destinationsData, this._offersData, this._externalData);
   }
 
+  saveInnerBackup() {
+    if (!this._innerBackup) {
+      this._innerBackup = this.getElement().innerHTML;
+    }
+  }
+
+  restoreInnerBackup() {
+    if (this._innerBackup) {
+      this.getElement().innerHTML = this._innerBackup;
+    }
+  }
+
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setCloseButtonClickHandler(this._closeHandler);
-    this.setFavoriteButtonClickHandler(this._favoriteBtnClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -282,14 +294,15 @@ export default class EventEdit extends AbstractSmartComponent {
     this._closeHandler = handler;
   }
 
-  setFavoriteButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
-    this._favoriteBtnClickHandler = handler;
-  }
-
   setDeleteButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
     this._deleteBtnClickHandler = handler;
+  }
+
+  restoreOffersFromBackup() {
+    if (this._offersBackup) {
+      this._event.offers = this._offersBackup;
+    }
   }
 
   _subscribeOnEvents() {
@@ -300,6 +313,10 @@ export default class EventEdit extends AbstractSmartComponent {
     element.querySelectorAll(`[name="event-type"]`).forEach((it) => {
       it.addEventListener(`click`, () => {
         if (it.value !== currentType) {
+          if (!this._offersBackup) {
+            this._offersBackup = this._event.offers;
+          }
+          this._event.offers = [];
           this._event.type = Object.keys(TRIP_POINTS_TYPES).find((type) => type === it.value);
           this.rerender();
         }
@@ -330,19 +347,21 @@ export default class EventEdit extends AbstractSmartComponent {
       const dateEndDefaultFormat = formatDateDefault(dateEnd, `DD-MM-YY HH:mm`);
       if (moment(dateEndDefaultFormat).isBefore(dateStartDefaultFormat)) {
         this._flatpickrEnd.destroy();
-        this._flatpickrEnd = flatpickr(dateEndElement, {// time_24hr: true, - надо добавить это чтобы время было в нормальном формате, но линтер ругается
-          dateFormat: `d/m/y H:i`,
-          defaultDate: dateStartElement.value,
-          enableTime: true,
-          minDate: dateStartElement.value,
+        this._flatpickrEnd = flatpickr(dateEndElement, {
+          "dateFormat": `d/m/y H:i`,
+          "defaultDate": dateStartElement.value,
+          "enableTime": true,
+          "minDate": dateStartElement.value,
+          "time_24hr": true
         });
       } else {
         this._flatpickrEnd.destroy();
         this._flatpickrEnd = flatpickr(dateEndElement, {
-          dateFormat: `d/m/y H:i`,
-          defaultDate: dateEnd,
-          enableTime: true,
-          minDate: dateStartElement.value,
+          "dateFormat": `d/m/y H:i`,
+          "defaultDate": dateEnd,
+          "enableTime": true,
+          "minDate": dateStartElement.value,
+          "time_24hr": true
         });
       }
     });
@@ -361,15 +380,17 @@ export default class EventEdit extends AbstractSmartComponent {
     const dateStartElement = this.getElement().querySelector(`[name="event-start-time"]`);
     const dateEndElement = this.getElement().querySelector(`[name="event-end-time"]`);
     this._flatpickrStart = flatpickr(dateStartElement, {
-      defaultDate: this._event.dateStart || `today`,
-      dateFormat: `d/m/y H:i`,
-      enableTime: true
+      "defaultDate": this._event.dateStart || `today`,
+      "dateFormat": `d/m/y H:i`,
+      "enableTime": true,
+      "time_24hr": true
     });
     this._flatpickrEnd = flatpickr(dateEndElement, {
-      dateFormat: `d/m/y H:i`,
-      defaultDate: this._event.dateEnd || `today`,
-      enableTime: true,
-      minDate: this._flatpickrStart.selectedDates[0],
+      "dateFormat": `d/m/y H:i`,
+      "defaultDate": this._event.dateEnd || `today`,
+      "enableTime": true,
+      "minDate": this._flatpickrStart.selectedDates[0],
+      "time_24hr": true
     });
   }
 

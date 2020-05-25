@@ -5,7 +5,7 @@ import TripController from "./controllers/trip.js";
 import FiltersController from "./controllers/filters.js";
 import MenuController from "./controllers/menu.js";
 import Points from "./models/points.js";
-import {renderPosition, renderComponent} from "./utils/render.js";
+import {renderPosition, renderComponent, renderElement, removeElement} from "./utils/render.js";
 
 const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 const AUTHORIZATION = `Basic hjq389q3hfkkadf8llm=`;
@@ -26,15 +26,21 @@ const menuController = new MenuController(controlsFirstTitleElement);
 export const tripController = new TripController(eventsElement, pointsModel, filtersController, api);
 export const statsComponent = new StatsComponent(pointsModel);
 
-newEventButton.addEventListener(`click`, tripController.createNewEvent);
+newEventButton.addEventListener(`click`, tripController.addNewEvent);
 
 filtersController.render();
 menuController.render();
 renderComponent(pageBodyElement, statsComponent, renderPosition.BEFOREEND);
 statsComponent.hide();
 
+const preloadInfo = `<div class="preload-container">Loading…</div>`;
+renderElement(eventsElement, preloadInfo, renderPosition.AFTERBEGIN);
+
 Promise.all([api.getPoints(), api.getDestinations(), api.getOffers()])
   .then((values) => {
+    const preloadElement = eventsElement.querySelector(`.preload-container`);
+    removeElement(preloadElement);
+
     const [points, destinations, offers] = values;
     pointsModel.setPoints(points);
     renderComponent(tripMainElement, new InfoBlockComponent(points), renderPosition.AFTERBEGIN);

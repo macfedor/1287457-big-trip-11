@@ -1,6 +1,6 @@
 import moment from "moment";
 import AbstractComponent from "./abstract-component.js";
-import {formatTime, formatDate, castFormat, ucFirst} from "../utils/common.js";
+import {formatTime, formatDate, castFormat, uppercaseFirstLetter} from "../utils/common.js";
 import {MAX_OFFERS_COUNT, TRIP_POINTS_TYPES} from "../consts.js";
 
 const createEventOffer = (offer) => {
@@ -37,7 +37,7 @@ const createEventTemplate = (currentEvent) => {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${TRIP_POINTS_TYPES[currentEvent.type].icon}" alt="Event type icon">
       </div>
-      <h3 class="event__title">${ucFirst(currentEvent.type)} ${TRIP_POINTS_TYPES[currentEvent.type].action} ${currentEvent.destination.name}</h3>
+      <h3 class="event__title">${uppercaseFirstLetter(currentEvent.type)} ${TRIP_POINTS_TYPES[currentEvent.type].action} ${currentEvent.destination.name}</h3>
 
       <div class="event__schedule">
         <p class="event__time">

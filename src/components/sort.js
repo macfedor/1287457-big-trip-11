@@ -11,18 +11,18 @@ const createSortTemplate = () => {
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
       <span class="trip-sort__item  trip-sort__item--day">Day</span>
 
-      ${Object.values(sortType).map(createSortItem).join(``)}
+      ${Object.values(sortType).map((item, index) => createSortItem(item, index)).join(``)}
 
       <span class="trip-sort__item  trip-sort__item--offers">Offers</span>
     </form>`
   );
 };
 
-const createSortItem = (sortItem) => {
+const createSortItem = (sortItem, index) => {
   const code = sortItem.toLowerCase();
   return (
     `<div class="trip-sort__item  trip-sort__item--${code}">
-      <input id="sort-${code}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${code}">
+<input id="sort-${code}" class="trip-sort__input  visually-hidden" type="radio" ${index === 0 ? `checked` : ``} name="trip-sort" value="sort-${code}">
       <label class="trip-sort__btn trip-sort__btn--by-increase" for="sort-${code}" data-sort-type="${code}">
         ${sortItem}
       </label>
@@ -51,8 +51,6 @@ export default class Sort extends AbstractComponent {
 
   setChangeSortTypeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-
       if (evt.target.tagName !== `LABEL`) {
         return;
       }

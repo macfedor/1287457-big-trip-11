@@ -22,30 +22,13 @@ export const formatDateRAW = (date) => {
   return `20${dateYearShort}-${dateMonth}-${dateDay}T${dateTime}`;
 };
 
-export const getRandomArrayItem = (array) => {
-  const randomIndex = getRandomIntegerNumber(0, array.length - 1);
-  return array[randomIndex];
-};
-
-export const getRandomIntegerNumber = (min, max) => {
-  return min + Math.floor(Math.random() * (max - min + 1));
-};
-
-export const getRandomDate = (start, end) => {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-};
-
-export const compareDates = (a, b) => {
-  return a.dateStart.getTime() - b.dateStart.getTime();
-};
-
 export const sortObjectByValues = (obj) => {
   return Object.fromEntries(Object.entries(obj).sort(function (a, b) {
     return b[1] - a[1];
   }));
 };
 
-export const ucFirst = (string) => {
+export const uppercaseFirstLetter = (string) => {
   return string[0].toUpperCase() + string.slice(1);
 };
 

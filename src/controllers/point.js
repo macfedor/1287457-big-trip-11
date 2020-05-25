@@ -4,7 +4,7 @@ import EventEditComponent from "../components/event-edit.js";
 import EventsListItemComponent from "../components/events-list-item.js";
 import PointModel from "../models/point.js";
 import {renderPosition, renderComponent, replace, remove} from "../utils/render.js";
-import {formatDateRAW, ucFirst} from "../utils/common.js";
+import {formatDateRAW, uppercaseFirstLetter} from "../utils/common.js";
 
 export const Mode = {
   DEFAULT: `default`,
@@ -16,7 +16,7 @@ const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const generateEmptyPoint = () => {
   return {
-    type: `taxi`,
+    type: `bus`,
     destination: {
       description: ``,
       name: ``,
@@ -33,11 +33,12 @@ const generateEmptyPoint = () => {
 export let EmptyPoint = generateEmptyPoint();
 
 export default class PointController extends AbstractComponent {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, onClose) {
     super();
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._onClose = onClose;
     this.mode = Mode.DEFAULT;
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -57,6 +58,7 @@ export default class PointController extends AbstractComponent {
   }
 
   _openEventEdit() {
+    this._eventEditComponent.saveInnerBackup();
     this._onViewChange();
     this.mode = Mode.EDIT;
     replace(this._eventEditComponent, this._eventComponent);
@@ -66,8 +68,11 @@ export default class PointController extends AbstractComponent {
     if (this.mode === Mode.ADDING) {
       this.destroyNewEvent();
       this.resetEmptyPoint();
+      this._onClose();
       return;
     }
+    this._eventEditComponent.restoreInnerBackup();
+    this._eventEditComponent.recoveryListeners();
     replace(this._eventComponent, this._eventEditComponent);
     this.mode = Mode.DEFAULT;
   }
@@ -115,7 +120,7 @@ export default class PointController extends AbstractComponent {
 
     for (let key of formData.keys()) {
       if (key.indexOf(`event-offer-`) !== -1) {
-        const offerName = ucFirst(key.split(`event-offer-`)[1].split(`_`).join(` `));
+        const offerName = uppercaseFirstLetter(key.split(`event-offer-`)[1].split(`_`).join(` `));
         const offerPrice = typicalOffers.find((offer) => offer.title.toLowerCase() === offerName.toLowerCase()).price;
         offers.push({title: offerName, price: offerPrice});
       }
@@ -192,17 +197,12 @@ export default class PointController extends AbstractComponent {
       this.resetEmptyPoint();
     });
 
-    this._eventEditComponent.setFavoriteButtonClickHandler(() => {
-      const newPoint = PointModel.clone(point);
-      newPoint.isFavorite = !newPoint.isFavorite;
-      this._onDataChange(this, point, newPoint);
-    });
-
     this._eventEditComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();
       if (this.mode === Mode.ADDING) {
         this.destroyNewEvent();
         this.resetEmptyPoint();
+        this._onClose();
         return;
       }
       this._eventEditComponent.setData({
@@ -229,6 +229,5 @@ export default class PointController extends AbstractComponent {
         this.mode = Mode.ADDING;
         break;
     }
-
   }
 }

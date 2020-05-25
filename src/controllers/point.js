@@ -118,7 +118,7 @@ export default class PointController extends AbstractComponent {
     const offers = [];
     const typicalOffers = this._offersList.find((offer) => offer.type === type).offers;
 
-    for (let key of formData.keys()) {
+    for (const key of formData.keys()) {
       if (key.indexOf(`event-offer-`) !== -1) {
         const offerName = uppercaseFirstLetter(key.split(`event-offer-`)[1].split(`_`).join(` `));
         const offerPrice = typicalOffers.find((offer) => offer.title.toLowerCase() === offerName.toLowerCase()).price;

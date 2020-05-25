@@ -67,7 +67,7 @@ const chartOptions = (title, format, isPrefix) => {
 };
 
 const getData = (points, dataType) => {
-  let data = {};
+  const data = {};
   points.forEach((point) => {
     const name = point.type;
     let term = 1;

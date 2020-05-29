@@ -3,13 +3,7 @@ import {formatDate} from "../utils/common.js";
 import {MONTH_SHORT_NAMES} from "../consts.js";
 
 const createEventsDayTemplate = (day) => {
-  let dayInfo = ``;
-  if (day !== undefined) {
-    dayInfo = `
-      <span class="day__counter">${day.dayNumber}</span>
-      <time class="day__date" datetime="${formatDate(day.date)}">${MONTH_SHORT_NAMES[day.date.getMonth()]} ${day.date.getDate()}</time>
-    `;
-  }
+  const dayInfo = day !== undefined ? `<span class="day__counter">${day.dayNumber}</span><time class="day__date" datetime="${formatDate(day.date)}">${MONTH_SHORT_NAMES[day.date.getMonth()]} ${day.date.getDate()}</time>` : ``;
 
   return (
     `<li class="trip-days__item  day">

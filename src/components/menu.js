@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component.js";
-import {sortType} from "../components/sort.js";
-import {statsComponent, tripController} from "../main.js";
+import {SortType} from "../consts.js";
+import {statisticsComponent, tripController} from "../main.js";
 
 const ACTIVE_CLASS = `trip-tabs__btn--active`;
 
@@ -47,12 +47,12 @@ export default class Menu extends AbstractComponent {
   toggleScreen(currentScreen) {
     switch (currentScreen) {
       case MenuItems.TABLE:
-        statsComponent.hide();
+        statisticsComponent.hide();
         tripController.show();
-        tripController.sort(sortType.EVENT);
+        tripController.sort(SortType.EVENT);
         break;
       case MenuItems.STATS:
-        statsComponent.show();
+        statisticsComponent.show();
         tripController.hide();
         break;
     }

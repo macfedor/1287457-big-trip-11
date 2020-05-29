@@ -1,10 +1,10 @@
 import {FilterTypes} from "../components/filter.js";
 
-const getFuturePoints = (points) => {
+export const getFuturePoints = (points) => {
   return points.filter((point) => point.dateStart > new Date());
 };
 
-const getPastPoints = (points) => {
+export const getPastPoints = (points) => {
   return points.filter((point) => point.dateEnd < new Date());
 };
 

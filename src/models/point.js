@@ -18,10 +18,6 @@ export default class Point {
     return data.map(Point.parsePoint);
   }
 
-  static clone(data) {
-    return new Point(data.toRAW());
-  }
-
   toRAW() {
     return {
       "id": this.id,
@@ -33,5 +29,9 @@ export default class Point {
       "destination": this.destination,
       "offers": this.offers
     };
+  }
+
+  static clone(data) {
+    return new Point(data.toRAW());
   }
 }

@@ -4,7 +4,8 @@ import EventEditComponent from "../components/event-edit.js";
 import EventsListItemComponent from "../components/events-list-item.js";
 import PointModel from "../models/point.js";
 import {renderPosition, renderComponent, replace, remove} from "../utils/render.js";
-import {formatDateRAW, uppercaseFirstLetter} from "../utils/common.js";
+import {formatDateRAW, formatText} from "../utils/common.js";
+import {ButtonText, KeyName} from "../consts.js";
 
 export const Mode = {
   DEFAULT: `default`,
@@ -13,6 +14,8 @@ export const Mode = {
 };
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
+const SHAKE_ANIMATION_STYLE = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+const ERROR_BORDER_STYLE = `1px solid #ff0000`;
 
 const generateEmptyPoint = () => {
   return {
@@ -30,7 +33,7 @@ const generateEmptyPoint = () => {
   };
 };
 
-export let EmptyPoint = generateEmptyPoint();
+export let emptyPoint = generateEmptyPoint();
 
 export default class PointController extends AbstractComponent {
   constructor(container, onDataChange, onViewChange, onClose) {
@@ -54,7 +57,7 @@ export default class PointController extends AbstractComponent {
   }
 
   resetEmptyPoint() {
-    EmptyPoint = generateEmptyPoint();
+    emptyPoint = generateEmptyPoint();
   }
 
   _openEventEdit() {
@@ -78,7 +81,7 @@ export default class PointController extends AbstractComponent {
   }
 
   _onEscKeyDown(evt) {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+    const isEscKey = evt.key === KeyName.ESCAPE || evt.key === KeyName.ESC;
     if (isEscKey) {
       this._closeEventEdit();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
@@ -120,9 +123,8 @@ export default class PointController extends AbstractComponent {
 
     for (const key of formData.keys()) {
       if (key.indexOf(`event-offer-`) !== -1) {
-        const offerName = uppercaseFirstLetter(key.split(`event-offer-`)[1].split(`_`).join(` `));
-        const offerPrice = typicalOffers.find((offer) => offer.title.toLowerCase() === offerName.toLowerCase()).price;
-        offers.push({title: offerName, price: offerPrice});
+        const currentOffer = typicalOffers.find((offer) => formatText(offer.title) === formatText(key.split(`event-offer-`)[1].split(`_`).join(` `)));
+        offers.push({title: currentOffer.title, price: currentOffer.price});
       }
     }
 
@@ -144,22 +146,22 @@ export default class PointController extends AbstractComponent {
   }
 
   shake() {
-    this._eventEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    this._eventComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._eventEditComponent.getElement().style.animation = SHAKE_ANIMATION_STYLE;
+    this._eventComponent.getElement().style.animation = SHAKE_ANIMATION_STYLE;
 
     setTimeout(() => {
       this._eventEditComponent.getElement().style.animation = ``;
       this._eventComponent.getElement().style.animation = ``;
 
       this._eventEditComponent.setData({
-        saveButtonText: `Save`,
-        deleteButtonText: `Delete`,
+        SAVE_BUTTON_TEXT: ButtonText.SAVE,
+        DELETE_BUTTON_TEXT: ButtonText.DELETE,
       });
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   setErrorStyle() {
-    this._eventEditComponent.getElement().style.border = `1px solid #ff0000`;
+    this._eventEditComponent.getElement().style.border = ERROR_BORDER_STYLE;
   }
 
   deleteErrorStyle() {
@@ -189,7 +191,7 @@ export default class PointController extends AbstractComponent {
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
       this._eventEditComponent.setData({
-        saveButtonText: `Saving...`,
+        SAVE_BUTTON_TEXT: ButtonText.SAVING,
       });
       const formData = this._eventEditComponent.getData();
       const data = this.parseFormData(formData);
@@ -206,7 +208,7 @@ export default class PointController extends AbstractComponent {
         return;
       }
       this._eventEditComponent.setData({
-        deleteButtonText: `Deleting...`,
+        DELETE_BUTTON_TEXT: ButtonText.DELETING,
       });
       this._onDataChange(this, point, null);
       document.removeEventListener(`keydown`, this._onEscKeyDown);

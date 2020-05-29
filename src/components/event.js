@@ -28,6 +28,7 @@ const createEventTemplate = (currentEvent) => {
 
   const duration = moment.duration(currentEvent.dateEnd.getTime() - currentEvent.dateStart.getTime());
   let durationString = ``;
+  durationString += duration._data.months ? castFormat(duration._data.months) + `MNTH ` : ``;
   durationString += duration._data.days ? castFormat(duration._data.days) + `D ` : ``;
   durationString += duration._data.hours ? castFormat(duration._data.hours) + `H ` : ``;
   durationString += duration._data.minutes ? castFormat(duration._data.minutes) + `M` : ``;
@@ -59,7 +60,7 @@ const createEventTemplate = (currentEvent) => {
   );
 };
 
-export default class Point extends AbstractComponent {
+export default class Event extends AbstractComponent {
   constructor(currentEvent) {
     super();
     this._event = currentEvent;

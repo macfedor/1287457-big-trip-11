@@ -1,32 +1,14 @@
 import AbstractComponent, {HIDDEN_CLASS} from "../components/abstract-component.js";
 import EventsListComponent from "../components/events-list.js";
 import EventsDayComponent from "../components/events-day.js";
-import SortComponent, {sortType} from "../components/sort.js";
+import SortComponent from "../components/sort.js";
 import NoEventsComponent from "../components/no-events.js";
 import InfoBlockComponent from "../components/trip-info.js";
 import {FilterTypes} from "../components/filter.js";
-import PointController, {EmptyPoint, Mode} from "../controllers/point.js";
+import PointController, {emptyPoint, Mode} from "../controllers/point.js";
 import {renderPosition, renderComponent, remove} from "../utils/render.js";
-
-
-const getSortedEvents = (events, type) => {
-  let sortedEvents = [];
-  const preSortedEvents = events.slice();
-
-  switch (type) {
-    case sortType.TIME:
-      sortedEvents = preSortedEvents.sort((a, b) => (b.dateEnd.getTime() - b.dateStart.getTime()) - (a.dateEnd.getTime() - a.dateStart.getTime()));
-      break;
-    case sortType.PRICE:
-      sortedEvents = preSortedEvents.sort((a, b) => b.price - a.price);
-      break;
-    case sortType.EVENT:
-      sortedEvents = preSortedEvents.sort((a, b) => a.dateStart.getTime() - b.dateStart.getTime());
-      break;
-  }
-
-  return sortedEvents;
-};
+import {getSortedEvents, generateRandomId} from "../utils/common.js";
+import {SortType} from "../consts.js";
 
 export default class TripController extends AbstractComponent {
   constructor(container, pointsModel, filtersController, api) {
@@ -49,8 +31,8 @@ export default class TripController extends AbstractComponent {
     this.checkNoPoints = this.checkNoPoints.bind(this);
     this._resetFilter = this._resetFilter.bind(this);
     this.sort = this.sort.bind(this);
-    this._defaultSortType = sortType.EVENT;
-    this._currentSortType = sortType.EVENT;
+    this._defaultSortType = SortType.EVENT;
+    this._currentSortType = SortType.EVENT;
     this._creatingEvent = null;
     this._destinationsData = null;
     this._offersData = null;
@@ -75,10 +57,10 @@ export default class TripController extends AbstractComponent {
     const points = this._pointsModel.getPoints();
 
     this._removePoints();
-    daysTitleElement.innerHTML = currentSortType === sortType.EVENT ? `Day` : ``;
+    daysTitleElement.innerHTML = currentSortType === SortType.EVENT ? `Day` : ``;
     const sortedEvents = getSortedEvents(points, currentSortType);
 
-    if (currentSortType === sortType.EVENT) {
+    if (currentSortType === SortType.EVENT) {
       this._createEventsList(sortedEvents, listElement);
     } else {
       renderComponent(listElement, new EventsDayComponent(), renderPosition.BEFOREEND);
@@ -126,12 +108,13 @@ export default class TripController extends AbstractComponent {
   _onDataChange(pointController, oldData, newData) {
     pointController.deleteErrorStyle();
     pointController.blockElement();
-    if (oldData === EmptyPoint) {
+    if (oldData === emptyPoint) {
       const addPointCallback = () => {
         this._creatingEvent = null;
         pointController.destroy();
         const newEventButton = document.querySelector(`.trip-main__event-add-btn`);
         newEventButton.disabled = false;
+        this._filtersController.rerender();
         this._updatePoints();
         this._updateTripInfo();
       };
@@ -154,6 +137,7 @@ export default class TripController extends AbstractComponent {
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
+          this._filtersController.rerender();
           this._updatePoints();
           this._updateTripInfo();
           pointController.unblockElement();
@@ -166,6 +150,7 @@ export default class TripController extends AbstractComponent {
       this._api.updatePoint(oldData.id, newData)
         .then((pointModel) => {
           this._pointsModel.updatePoint(oldData.id, pointModel);
+          this._filtersController.rerender();
           this._updatePoints();
           this._updateTripInfo();
           pointController.unblockElement();
@@ -219,11 +204,12 @@ export default class TripController extends AbstractComponent {
     newEventButton.disabled = true;
     const pointController = new PointController(container, this._onDataChange, this._onViewChange, this.checkNoPoints);
     this._creatingEvent = pointController;
-    EmptyPoint.id = String(Math.random()).replace(`.`, ``);
-    this._creatingEvent.render(EmptyPoint, Mode.ADDING, this._destinationsData, this._offersData);
+    emptyPoint.id = generateRandomId();
+    this._creatingEvent.render(emptyPoint, Mode.ADDING, this._destinationsData, this._offersData);
   }
 
   addNewEvent() {
+    document.querySelector(`.trip-sort__input`).checked = true;
     if (document.querySelectorAll(`.trip-events__item`).length) {
       this._removePoints();
       this._resetFilter();
@@ -252,7 +238,7 @@ export default class TripController extends AbstractComponent {
     }
     const points = getSortedEvents(this._pointsModel.getPoints(), this._currentSortType);
     this.checkNoPoints();
-    if (!this._pointsModel.getPoints().length) {
+    if (!points.length) {
       return;
     }
     renderComponent(this._container, this._sortComponent, renderPosition.BEFOREEND);

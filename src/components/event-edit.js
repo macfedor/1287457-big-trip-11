@@ -1,17 +1,17 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {TRIP_POINTS_TYPES} from "../consts.js";
-import {castFormat, formatTime, formatDateDefault, uppercaseFirstLetter} from "../utils/common.js";
+import {TRIP_POINTS_TYPES, KeyName, ButtonText} from "../consts.js";
+import {castFormat, formatTime, formatDateDefault, uppercaseFirstLetter, formatText} from "../utils/common.js";
 import {renderPosition, renderElement} from "../utils/render.js";
-import {EmptyPoint} from "../controllers/point.js";
+import {emptyPoint} from "../controllers/point.js";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import moment from "moment";
 const transfers = Object.values(TRIP_POINTS_TYPES).filter((item) => item.action === `to`);
 const activities = Object.values(TRIP_POINTS_TYPES).filter((item) => item.action === `in`);
 
-const DefaultData = {
-  deleteButtonText: `Delete`,
-  saveButtonText: `Save`,
+export const DefaultData = {
+  DELETE_BUTTON_TEXT: ButtonText.DELETE,
+  SAVE_BUTTON_TEXT: ButtonText.SAVE,
 };
 
 const generateEventType = (item, currentItem) => {
@@ -26,11 +26,12 @@ const generateEventType = (item, currentItem) => {
 };
 
 const generateOffer = (offer, activeOffersList, pointId) => {
-  const code = offer.title.toLowerCase().split(` `).join(`_`);
+  const code = formatText(offer.title).split(` `).join(`_`);
+
   return (
     `
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${code}-${pointId}" type="checkbox" name="event-offer-${code}" ${activeOffersList.find((item) => item.title === offer.title) ? `checked=""` : ``}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${code}-${pointId}" type="checkbox" name="event-offer-${code}" ${activeOffersList.find((item) => formatText(item.title) === formatText(offer.title)) ? `checked=""` : ``}>
         <label class="event__offer-label" for="event-offer-${code}-${pointId}">
           <span class="event__offer-title">${offer.title}</span>
           +
@@ -103,8 +104,8 @@ const createPhotosBlock = (pictures) => {
 
 const createEventEditTemplate = (eventItem, destinationsData, offersData, externalData) => {
 
-  const deleteButtonText = externalData.deleteButtonText;
-  const saveButtonText = externalData.saveButtonText;
+  const deleteButtonText = externalData.DELETE_BUTTON_TEXT;
+  const saveButtonText = externalData.SAVE_BUTTON_TEXT;
 
   let transfersBlock = ``;
   if (transfers.length > 0) {
@@ -132,7 +133,7 @@ const createEventEditTemplate = (eventItem, destinationsData, offersData, extern
   let additionalClass = `trip-events__item`;
   let resetBtnText = `Close`;
 
-  if (eventItem !== EmptyPoint) {
+  if (eventItem !== emptyPoint) {
     additionalClass = ``;
     resetBtnText = `${deleteButtonText}`;
   }
@@ -215,7 +216,6 @@ export default class EventEdit extends AbstractSmartComponent {
     this._destinationsData = destinationsData || [];
     this._offersData = offersData || [];
     this._externalData = DefaultData;
-    this._offersBackup = null;
     this._innerBackup = null;
     this._subscribeOnEvents();
     this._submitHandler = null;
@@ -279,9 +279,9 @@ export default class EventEdit extends AbstractSmartComponent {
 
   setData(data) {
     this._externalData = Object.assign({}, DefaultData, data);
-    this.getElement().querySelector(`.event__save-btn`).textContent = this._externalData.saveButtonText;
+    this.getElement().querySelector(`.event__save-btn`).textContent = this._externalData.SAVE_BUTTON_TEXT;
     const deleteButton = this.getElement().querySelector(`.event__reset-btn`);
-    deleteButton.textContent = deleteButton.textContent === `Close` ? `Close` : this._externalData.deleteButtonText;
+    deleteButton.textContent = deleteButton.textContent === ButtonText.CLOSE ? ButtonText.CLOSE : this._externalData.DELETE_BUTTON_TEXT;
   }
 
   setSubmitHandler(handler) {
@@ -299,12 +299,6 @@ export default class EventEdit extends AbstractSmartComponent {
     this._deleteBtnClickHandler = handler;
   }
 
-  restoreOffersFromBackup() {
-    if (this._offersBackup) {
-      this._event.offers = this._offersBackup;
-    }
-  }
-
   _subscribeOnEvents() {
     const element = this.getElement();
     const currentType = element.querySelector(`[name="event-type"]:checked`) ? element.querySelector(`[name="event-type"]:checked`).value : ``;
@@ -313,29 +307,26 @@ export default class EventEdit extends AbstractSmartComponent {
     element.querySelectorAll(`[name="event-type"]`).forEach((it) => {
       it.addEventListener(`click`, () => {
         if (it.value !== currentType) {
-          if (!this._offersBackup) {
-            this._offersBackup = this._event.offers;
-          }
           this._event.offers = [];
           this._event.type = Object.keys(TRIP_POINTS_TYPES).find((type) => type === it.value);
           this.rerender();
         }
       });
     });
-
     destinationElement.addEventListener(`change`, (evt) => {
-      const newValue = evt.target.value;
-      if (!newValue) {
-        evt.target.value = this._event.destination.name;
-        return;
+      const newDestination = this._destinationsData.find((it) => it.name === evt.target.value);
+      if (newDestination !== undefined) {
+        this._event.destination = newDestination;
+        this.rerenderDestinationInfo(this._event.destination);
+      } else {
+        destinationElement.value = ``;
       }
-      this._event.destination = this._destinationsData.find((it) => it.name === newValue);
-      this.rerenderDestinationInfo(this._event.destination);
     });
 
     destinationElement.addEventListener(`keydown`, (evt) => {
-      if (evt.key !== `Backspace`) {
-        evt.preventDefault();
+      evt.preventDefault();
+      if (evt.key === KeyName.BACKSPACE) {
+        destinationElement.value = ``;
       }
     });
 

@@ -1,4 +1,4 @@
-export const MAX_OFFERS_COUNT = 3; // максимум допопций в списке
+export const MAX_OFFERS_COUNT = 3;
 
 export const MONTH_SHORT_NAMES = [
   `JAN`,
@@ -14,6 +14,26 @@ export const MONTH_SHORT_NAMES = [
   `NOV`,
   `DEC`
 ];
+
+export const KeyName = {
+  BACKSPACE: `Backspace`,
+  ESCAPE: `Escape`,
+  ESC: `Esc`,
+};
+
+export const ButtonText = {
+  SAVE: `Save`,
+  SAVING: `Saving...`,
+  DELETE: `Delete`,
+  DELETING: `Deleting...`,
+  CLOSE: `Close`,
+};
+
+export const SortType = {
+  EVENT: `event`,
+  TIME: `time`,
+  PRICE: `price`
+};
 
 export const TRIP_POINTS_TYPES = {
   'taxi': {

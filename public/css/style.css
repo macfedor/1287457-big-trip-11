@@ -266,6 +266,11 @@ main {
 .trip-filters__filter-input:checked + .trip-filters__filter-label {
   opacity: 1;
   cursor: default; }
+  
+.trip-filters__filter-label--disabled, .trip-filters__filter-label--disabled:hover {
+  cursor: default;
+  opacity: 0.6;
+}
 
 .trip-search {
   -ms-flex-positive: 1;

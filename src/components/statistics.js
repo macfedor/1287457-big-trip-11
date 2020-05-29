@@ -12,6 +12,12 @@ const DataTypes = {
   TIME: `time`
 };
 
+const ChartHeights = {
+  MONEY: 6,
+  TRANSPORT: 4,
+  TIME: 4,
+};
+
 const chartOptions = (title, format, isPrefix) => {
   return ({
     plugins: {
@@ -88,7 +94,7 @@ const getData = (points, dataType) => {
 
 const renderMoneyChart = (points) => {
   const moneyCtx = document.querySelector(`.statistics__chart--money`);
-  moneyCtx.height = BAR_HEIGHT * 6;
+  moneyCtx.height = BAR_HEIGHT * ChartHeights.MONEY;
   const moneyData = getData(points, DataTypes.PRICE);
   const types = Object.keys(moneyData);
   const prices = Object.values(moneyData);
@@ -111,7 +117,7 @@ const renderMoneyChart = (points) => {
 
 const renderTransportChart = (points) => {
   const transportCtx = document.querySelector(`.statistics__chart--transport`);
-  transportCtx.height = BAR_HEIGHT * 4;
+  transportCtx.height = BAR_HEIGHT * ChartHeights.TRANSPORT;
 
   const transportData = getData(points);
   const types = Object.keys(transportData);
@@ -135,7 +141,7 @@ const renderTransportChart = (points) => {
 
 const renderTimeChart = (points) => {
   const timeSpendCtx = document.querySelector(`.statistics__chart--time`);
-  timeSpendCtx.height = BAR_HEIGHT * 4;
+  timeSpendCtx.height = BAR_HEIGHT * ChartHeights.TIME;
 
   const timeData = getData(points, DataTypes.TIME);
   const types = Object.keys(timeData);

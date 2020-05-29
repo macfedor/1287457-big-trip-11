@@ -1,17 +1,12 @@
 import AbstractComponent from "./abstract-component.js";
-
-export const sortType = {
-  EVENT: `event`,
-  TIME: `time`,
-  PRICE: `price`
-};
+import {SortType} from "../consts.js";
 
 const createSortTemplate = () => {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
       <span class="trip-sort__item  trip-sort__item--day">Day</span>
 
-      ${Object.values(sortType).map((item, index) => createSortItem(item, index)).join(``)}
+      ${Object.values(SortType).map((item, index) => createSortItem(item, index)).join(``)}
 
       <span class="trip-sort__item  trip-sort__item--offers">Offers</span>
     </form>`
@@ -39,10 +34,6 @@ export default class Sort extends AbstractComponent {
 
   getTemplate() {
     return createSortTemplate(this._sortItems);
-  }
-
-  getSortType() {
-    return this._sortType;
   }
 
   setSortType(currentSortType) {

@@ -2,7 +2,7 @@ import AbstractComponent from "../components/abstract-component.js";
 import MenuComponent, {MenuItems} from "../components/menu.js";
 import {renderPosition, renderComponent} from "../utils/render.js";
 
-export default class FiltersController extends AbstractComponent {
+export default class MenuController extends AbstractComponent {
   constructor(container) {
     super();
     this._container = container;

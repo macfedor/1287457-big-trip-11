@@ -17,21 +17,17 @@ export default class Points {
     return getPointsByFilter(this._points, this._activeFilter);
   }
 
-  getAllPoints() {
-    return this._points;
-  }
-
   setPoints(points) {
     this._points = points;
-  }
-
-  setDataChangeHandler(handler) {
-    this._dataChangeHandlers.push(handler);
   }
 
   setActiveFilter(filterType) {
     this._activeFilter = filterType;
     this._callHandlers(this._filterChangeHandlers);
+  }
+
+  getActiveFilter() {
+    return this._activeFilter;
   }
 
   setFilterChangeHandler(handler) {
